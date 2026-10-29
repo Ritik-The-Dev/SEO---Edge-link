@@ -169,6 +169,39 @@ export function SignalObservatory({ className }: { className?: string }) {
       ctx.lineWidth = 1
       ctx.stroke()
 
+      // Signal links: faint arcs between adjacent markers on the near face
+      ctx.lineWidth = 1
+      for (let i = 0; i < SIGNALS.length; i += 1) {
+        const from = SIGNALS[i]
+        const to = SIGNALS[(i + 1) % SIGNALS.length]
+        if (!from || !to) continue
+        const a = project(from.lat, from.lon, radius * 1.02, spin, tilt)
+        const b = project(to.lat, to.lon, radius * 1.02, spin, tilt)
+        if (a.depth < 0.5 || b.depth < 0.5) continue
+        const midX = (a.x + b.x) / 2
+        const midY = (a.y + b.y) / 2
+        const controlX = midX + (width / 2 - midX) * 0.16
+        const controlY = midY + (height / 2 - midY) * 0.16
+        ctx.beginPath()
+        ctx.moveTo(a.x, a.y)
+        ctx.quadraticCurveTo(controlX, controlY, b.x, b.y)
+        ctx.strokeStyle = `hsl(${accent} / 0.16)`
+        ctx.stroke()
+      }
+
+      // Coordinate ticks around the outer ring
+      for (let i = 0; i < 84; i += 1) {
+        const theta = (i / 84) * Math.PI * 2
+        const major = i % 7 === 0
+        const inner = radius * 1.1
+        const outer = radius * (major ? 1.19 : 1.15)
+        ctx.beginPath()
+        ctx.moveTo(width / 2 + Math.cos(theta) * inner, height / 2 + Math.sin(theta) * inner)
+        ctx.lineTo(width / 2 + Math.cos(theta) * outer, height / 2 + Math.sin(theta) * outer)
+        ctx.strokeStyle = `hsl(${major ? accent : line} / ${major ? 0.34 : 0.5})`
+        ctx.stroke()
+      }
+
       // Signal markers on the sphere
       SIGNALS.forEach((signal, index) => {
         const point = project(signal.lat, signal.lon, radius * 1.02, spin, tilt)

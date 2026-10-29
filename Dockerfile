@@ -19,6 +19,8 @@ RUN apt-get update \
 # Install exactly the locked dependency tree once and reuse it.
 FROM base AS deps
 COPY package.json package-lock.json ./
+# postinstall runs `prisma generate`, so the schema must exist before install.
+COPY prisma/schema.prisma ./prisma/schema.prisma
 RUN npm ci
 
 FROM deps AS build

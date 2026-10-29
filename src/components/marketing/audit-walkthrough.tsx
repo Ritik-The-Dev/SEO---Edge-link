@@ -72,8 +72,8 @@ export function AuditWalkthrough() {
   const step = STEPS[active] ?? STEPS[0]
 
   return (
-    <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
-      <div className="lg:col-span-4">
+    <div className="grid min-w-0 gap-8 lg:grid-cols-12 lg:gap-12">
+      <div className="min-w-0 lg:col-span-4">
         <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:gap-0 lg:overflow-visible">
           {STEPS.map((item, index) => (
             <button
@@ -102,7 +102,7 @@ export function AuditWalkthrough() {
         </p>
       </div>
 
-      <div className="lg:col-span-8">
+      <div className="min-w-0 lg:col-span-8">
         <div className="panel overflow-hidden">
           <div className="flex items-center justify-between border-b border-line px-5 py-3">
             <span className="mono-label">Stage {String(active + 1).padStart(2, '0')} · {step.label}</span>

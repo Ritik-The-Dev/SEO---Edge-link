@@ -213,7 +213,7 @@ The worker needs a Chromium binary:
 - Debian/Ubuntu worker host: `apt-get install -y chromium` (the Docker `worker` target already does this and points `PUPPETEER_EXECUTABLE_PATH` at it).
 - If no browser is found the audit fails with an explicit message; it never writes a placeholder PDF.
 
-PDFs are written through `src/report/storage.ts`. The default adapter is local disk. **On Vercel the filesystem is ephemeral**, so either run the worker where `.data/reports` is persistent (Docker volume) or implement the S3/R2 adapter — the interface is four methods.
+PDFs are written through `src/report/storage.ts`. The default adapter is local disk. **On Vercel the filesystem is ephemeral**, so either run the worker where `.data/reports` is persistent (Docker volume) or implement the S3/R2 adapter — the interface is four methods. The web app and worker must share the same storage: the current local adapter only works when both run against the same volume, which is why the included worker image mounts `.data/reports`.
 
 ## Deployment
 
@@ -221,8 +221,9 @@ PDFs are written through `src/report/storage.ts`. The default adapter is local d
 
 1. Import the repository; framework preset Next.js, build `npm run build`.
 2. Add `DATABASE_URL`, `AUTH_SECRET`, `CRON_SECRET`, `APP_URL` (your Vercel URL), `REDIS_URL`, `USE_MOCKS`, `AI_USE_MOCKS` (and `ANTHROPIC_API_KEY` if `AI_USE_MOCKS=false`).
-3. Run `npx prisma db push` against the production database once, from your machine.
-4. Deploy.
+3. The `postinstall` script runs `prisma generate`, so the Prisma Client is built during the Vercel install step. `/api/health` and all data routes are dynamic, so the build never needs a live database.
+4. Run `npx prisma db push` against the production database once, from your machine.
+5. Deploy.
 
 ### Worker → an always-on host
 

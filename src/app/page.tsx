@@ -18,6 +18,7 @@ import { SiteFooter } from '@/components/marketing/site-footer'
 import { SignalObservatory } from '@/components/marketing/signal-observatory'
 import { AuditWalkthrough } from '@/components/marketing/audit-walkthrough'
 import { ReportPreview } from '@/components/marketing/report-preview'
+import { ProductConsole } from '@/components/marketing/product-console'
 import { Reveal } from '@/components/marketing/reveal'
 import { Button } from '@/components/ui/button'
 import { Badge, StatusPill } from '@/components/ui/badge'
@@ -150,14 +151,15 @@ export default async function LandingPage() {
           <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-5">
               <Reveal>
-                <div className="mb-6 flex items-center gap-3">
+                <div className="mb-7 flex items-center gap-3">
+                  <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-faint">01</span>
                   <span className="mono-label">Edgelink · SEO intelligence</span>
                   <span className="h-px flex-1 bg-line" />
                 </div>
               </Reveal>
 
               <Reveal delay={0.05}>
-                <h1 className="font-display text-[2.9rem] leading-[0.96] tracking-[-0.015em] sm:text-[3.8rem] lg:text-[4.1rem]">
+                <h1 className="font-display text-[3rem] leading-[0.94] tracking-[-0.02em] sm:text-[3.9rem] lg:text-[4.4rem]">
                   Know what is
                   <br />
                   <em className="italic text-accent">holding</em> your
@@ -188,12 +190,19 @@ export default async function LandingPage() {
               </Reveal>
 
               <Reveal delay={0.2}>
-                <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-5 font-mono text-[0.6rem] uppercase tracking-[0.14em] text-faint">
-                  <span>Fetch + Cheerio crawl</span>
-                  <span className="text-line">/</span>
-                  <span>Claude analysis</span>
-                  <span className="text-line">/</span>
-                  <span>Puppeteer reports</span>
+                <div className="mt-9 grid max-w-md grid-cols-3 gap-px border-y border-line bg-line">
+                  {[
+                    ['Crawl', 'fetch + cheerio'],
+                    ['Analyse', 'claude / fixture'],
+                    ['Deliver', 'pdf + notify'],
+                  ].map(([label, detail]) => (
+                    <div key={label} className="bg-canvas px-3 py-3 first:pl-0">
+                      <div className="font-mono text-[0.58rem] uppercase tracking-[0.14em] text-ink">{label}</div>
+                      <div className="mt-0.5 font-mono text-[0.52rem] uppercase tracking-[0.1em] text-faint">
+                        {detail}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </Reveal>
             </div>
@@ -201,8 +210,25 @@ export default async function LandingPage() {
             <div className="lg:col-span-7">
               <Reveal delay={0.1}>
                 <div className="relative">
-                  <div className="panel overflow-hidden">
+                  <div className="panel relative overflow-hidden">
                     <div className="pointer-events-none absolute inset-0 grid-lines opacity-40" />
+                    <span className="pointer-events-none absolute left-2 top-2 z-10 h-3 w-3 border-l border-t border-accent/50" aria-hidden />
+                    <span className="pointer-events-none absolute right-2 top-2 z-10 h-3 w-3 border-r border-t border-accent/50" aria-hidden />
+                    <span className="pointer-events-none absolute bottom-2 left-2 z-10 h-3 w-3 border-b border-l border-accent/50" aria-hidden />
+                    <span className="pointer-events-none absolute bottom-2 right-2 z-10 h-3 w-3 border-b border-r border-accent/50" aria-hidden />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-24 flex-col justify-center gap-4 border-l border-line/60 bg-canvas/40 px-3 backdrop-blur-[1px] sm:flex">
+                      {[
+                        ['scan', 'active'],
+                        ['signals', '15'],
+                        ['depth', '2.4k'],
+                        ['mode', 'fixture'],
+                      ].map(([label, value]) => (
+                        <div key={label}>
+                          <div className="font-mono text-[0.5rem] uppercase tracking-[0.14em] text-faint">{label}</div>
+                          <div className="mt-0.5 font-mono text-[0.6rem] text-ink">{value}</div>
+                        </div>
+                      ))}
+                    </div>
                     <SignalObservatory className="relative aspect-[5/4] w-full" />
                   </div>
 
@@ -243,6 +269,29 @@ export default async function LandingPage() {
           ))}
         </div>
       </div>
+
+      {/* Product interface */}
+      <section id="interface" className="border-b border-line bg-surface/20">
+        <div className="mx-auto w-full max-w-[1280px] px-5 py-16 lg:px-8 lg:py-24">
+          <Reveal>
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div className="mono-label">02 — The workspace</div>
+                <h2 className="mt-3 max-w-2xl font-display text-[2rem] leading-[1.04] tracking-[-0.01em] sm:text-[2.6rem]">
+                  The audit is the product. Not a summary of one.
+                </h2>
+              </div>
+              <p className="max-w-sm text-xs leading-relaxed text-muted">
+                Score, severity, measured evidence and the exact verification step — on one screen, generated from
+                the stored audit rather than a marketing mock-up.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <ProductConsole />
+          </Reveal>
+        </div>
+      </section>
 
       {/* Platform / problem */}
       <section id="platform" className="border-b border-line">
@@ -313,7 +362,7 @@ export default async function LandingPage() {
           <Reveal>
             <div className="mb-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <div className="mono-label">02 — Inside the pipeline</div>
+                <div className="mono-label">03 — Inside the pipeline</div>
                 <h2 className="mt-4 max-w-xl font-display text-[2.2rem] leading-[1.04] tracking-[-0.01em] sm:text-[2.8rem]">
                   From a URL to a report, <em className="italic text-accent">verifiably</em>.
                 </h2>
@@ -335,7 +384,7 @@ export default async function LandingPage() {
         <div className="mx-auto w-full max-w-[1280px] px-5 py-20 lg:px-8 lg:py-28">
           <Reveal>
             <div className="mb-10 max-w-2xl">
-              <div className="mono-label">03 — What you get</div>
+              <div className="mono-label">04 — What you get</div>
               <h2 className="mt-4 font-display text-[2.2rem] leading-[1.04] tracking-[-0.01em] sm:text-[2.8rem]">
                 A research department, not a dashboard theme.
               </h2>
@@ -343,13 +392,23 @@ export default async function LandingPage() {
           </Reveal>
 
           <Reveal delay={0.05}>
-            <div className="grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
-              {FEATURES.map((feature) => (
-                <div key={feature.title} className="bg-canvas p-6">
-                  <feature.icon className="h-4 w-4 text-accent" aria-hidden />
-                  <h3 className="mt-4 text-sm font-medium text-ink">{feature.title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-muted">{feature.body}</p>
-                  <div className="mt-4 border-t border-line pt-3 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-faint">
+            <div className="border-t border-line">
+              {FEATURES.map((feature, index) => (
+                <div
+                  key={feature.title}
+                  className="group grid gap-3 border-b border-line py-6 transition-colors hover:bg-surface/40 sm:grid-cols-[3.5rem_1fr_14rem] sm:gap-6 sm:py-7"
+                >
+                  <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:pt-0.5">
+                    <span className="font-mono text-[0.58rem] tabular-nums text-faint">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <feature.icon className="h-4 w-4 text-accent/80" aria-hidden />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-medium tracking-[-0.01em] text-ink">{feature.title}</h3>
+                    <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-muted">{feature.body}</p>
+                  </div>
+                  <div className="font-mono text-[0.56rem] uppercase leading-relaxed tracking-[0.14em] text-faint sm:pt-1 sm:text-right">
                     {feature.fact}
                   </div>
                 </div>
@@ -365,7 +424,7 @@ export default async function LandingPage() {
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-5">
               <Reveal>
-                <div className="mono-label">04 — Client reporting</div>
+                <div className="mono-label">05 — Client reporting</div>
                 <h2 className="mt-4 font-display text-[2.2rem] leading-[1.04] tracking-[-0.01em] sm:text-[2.8rem]">
                   Reports a client can <em className="italic text-accent">act on</em>.
                 </h2>
@@ -410,7 +469,7 @@ export default async function LandingPage() {
           <Reveal>
             <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <div className="mono-label">05 — Operating rhythm</div>
+                <div className="mono-label">06 — Operating rhythm</div>
                 <h2 className="mt-4 font-display text-[2.2rem] leading-[1.04] tracking-[-0.01em] sm:text-[2.6rem]">
                   Four steps, every month.
                 </h2>
@@ -421,21 +480,25 @@ export default async function LandingPage() {
             </div>
           </Reveal>
 
-          <div className="grid gap-px overflow-hidden rounded-md border border-line bg-line md:grid-cols-4">
-            {WORKFLOW.map((item, index) => (
-              <div key={item.step} className="relative bg-canvas p-6">
+          <ol className="relative border-l border-line md:grid md:grid-cols-4 md:border-l-0 md:border-t">
+            {WORKFLOW.map((item) => (
+              <li
+                key={item.step}
+                className="group relative pb-8 pl-6 last:pb-0 md:pb-0 md:pl-0 md:pr-6 md:pt-7"
+              >
+                <span
+                  className="absolute -left-[4.5px] top-1.5 h-2 w-2 rounded-full border border-accent/70 bg-canvas transition-colors group-hover:bg-accent md:-top-[4.5px] md:left-0"
+                  aria-hidden
+                />
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-faint">{item.step}</span>
-                  <item.icon className="h-3.5 w-3.5 text-accent/80" aria-hidden />
+                  <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-faint">{item.step}</span>
+                  <item.icon className="h-3.5 w-3.5 text-accent/70" aria-hidden />
                 </div>
-                <h3 className="mt-5 text-sm font-medium text-ink">{item.title}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted">{item.body}</p>
-                {index < WORKFLOW.length - 1 ? (
-                  <ArrowRight className="absolute -right-2 top-1/2 hidden h-3.5 w-3.5 -translate-y-1/2 text-line md:block" aria-hidden />
-                ) : null}
-              </div>
+                <h3 className="mt-3 text-sm font-medium text-ink">{item.title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted">{item.body}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
@@ -445,7 +508,7 @@ export default async function LandingPage() {
           <div className="grid gap-12 lg:grid-cols-12">
             <div className="lg:col-span-4">
               <Reveal>
-                <div className="mono-label">06 — Security &amp; privacy</div>
+                <div className="mono-label">07 — Security &amp; privacy</div>
                 <h2 className="mt-4 font-display text-[2.2rem] leading-[1.04] tracking-[-0.01em] sm:text-[2.6rem]">
                   Built to be audited, not just trusted.
                 </h2>
@@ -456,30 +519,28 @@ export default async function LandingPage() {
               </Reveal>
             </div>
             <div className="lg:col-span-8">
-              <div className="grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-2">
-                {SECURITY.map((item) => (
-                  <div key={item.title} className="bg-canvas p-6">
-                    <item.icon className="h-4 w-4 text-accent" aria-hidden />
-                    <h3 className="mt-4 text-sm font-medium text-ink">{item.title}</h3>
-                    <p className="mt-2 text-xs leading-relaxed text-muted">{item.body}</p>
+              <div className="grid gap-x-10 border-t border-line sm:grid-cols-2">
+                {[
+                  ...SECURITY,
+                  {
+                    icon: Braces,
+                    title: 'Typed trust boundaries',
+                    body: 'Every request body is validated with Zod on the server. AI responses are validated against a versioned schema before storage — invalid output fails the audit instead of being published.',
+                  },
+                  {
+                    icon: Terminal,
+                    title: 'Secrets stay server-side',
+                    body: 'Database, Redis, Anthropic and notification credentials live in environment variables and are never bundled into client code. Sessions are signed, HttpOnly cookies.',
+                  },
+                ].map((item) => (
+                  <div key={item.title} className="flex gap-4 border-b border-line py-5">
+                    <item.icon className="mt-0.5 h-4 w-4 shrink-0 text-accent/80" aria-hidden />
+                    <div>
+                      <h3 className="text-sm font-medium text-ink">{item.title}</h3>
+                      <p className="mt-1.5 text-xs leading-relaxed text-muted">{item.body}</p>
+                    </div>
                   </div>
                 ))}
-                <div className="bg-canvas p-6">
-                  <Braces className="h-4 w-4 text-accent" aria-hidden />
-                  <h3 className="mt-4 text-sm font-medium text-ink">Typed trust boundaries</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-muted">
-                    Every request body is validated with Zod on the server. AI responses are validated against a
-                    versioned schema before storage — invalid output fails the audit instead of being published.
-                  </p>
-                </div>
-                <div className="bg-canvas p-6">
-                  <Terminal className="h-4 w-4 text-accent" aria-hidden />
-                  <h3 className="mt-4 text-sm font-medium text-ink">Secrets stay server-side</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-muted">
-                    Database, Redis, Anthropic and notification credentials live in environment variables and are
-                    never bundled into client code. Sessions are signed, HttpOnly cookies.
-                  </p>
-                </div>
               </div>
             </div>
           </div>

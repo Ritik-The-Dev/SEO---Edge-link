@@ -178,6 +178,33 @@ Prepared, not executed:
 
 ---
 
+## 8b. Final polish pass (same day, after the first report)
+
+Second pass focused on art direction, responsive layout and deployment readiness while preserving the pipeline.
+
+**Changed**
+
+- New sample audit console on `/` (`src/components/marketing/product-console.tsx`) built from the same score/badge primitives as the real audit screen; labelled `sample data` with fixture provenance.
+- Hero recomposition: indexed eyebrow, tighter display type, corner registration marks, a measurement rail on the observatory, and a three-cell crawl → analyse → deliver strip.
+- Signal observatory: added near-face signal arcs, outer coordinate ticks and a wider annotated scan; still Canvas 2D, capped at 2x DPR, paused offscreen, static under reduced motion.
+- Replaced three repeated card grids on the landing page with an editorial capability ledger, a connected timeline, and a two-column security ledger.
+- Fixed a real mobile overflow bug in the pipeline walkthrough (`min-w-0` on both grid tracks); the page now measures 380 px scroll width at a 390 px viewport.
+- Deployment: added `postinstall: prisma generate` and `engines.node >= 20` for Vercel builds, and fixed the Docker `deps` stage to copy the Prisma schema before `npm ci` (the postinstall hook needs it).
+
+**Re-run after the changes**
+
+| Check | Result |
+| --- | --- |
+| `npx tsc --noEmit` | PASS |
+| `npm run lint` | PASS — no warnings |
+| `npm test` | PASS — 94 tests / 8 files |
+| `npm run build` | PASS — compiled successfully |
+| `GET /api/health` | 200 — database, Redis, renderer true |
+| Landing page at 1440 px / 390 px | 200; no document-level horizontal overflow after the fix |
+| Dashboard, audit detail, client portal | unchanged code; still served 200 by the restarted dev server |
+
+**Still not verified:** no Vercel deploy (no account/token here), no Docker image (Docker Hub DNS blocked), no live Claude or third-party calls (no credentials).
+
 ## 9. Submission checklist
 
 | Item | State |
