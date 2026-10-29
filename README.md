@@ -170,7 +170,11 @@ Without the worker, audits stay `QUEUED`; the UI says so explicitly.
 | `ANTHROPIC_API_KEY` | when AI is live | Claude API key |
 | `ANTHROPIC_MODEL` | no | Default `claude-sonnet-4-6`; use a model your key can access |
 | `PAGESPEED_API_KEY` | when mocks are off | Live PageSpeed Insights |
-| `REPORT_STORAGE`, `REPORT_DIR` | no | Report adapter (`local`) and directory |
+| `REPORT_STORAGE` | no | `local` (default, dev/single host) or `supabase` (durable object storage) |
+| `REPORT_DIR` | no | Directory used by the `local` adapter |
+| `SUPABASE_URL` | when `REPORT_STORAGE=supabase` | Supabase project URL (server-only) |
+| `SUPABASE_SERVICE_ROLE_KEY` | when `REPORT_STORAGE=supabase` | Storage service-role key; never exposed to the browser |
+| `SUPABASE_REPORT_BUCKET` | no | Private bucket name, default `reports` |
 | `PUPPETEER_EXECUTABLE_PATH` | no | Explicit Chrome path; autodetected when empty |
 | `EMAIL_TRANSPORT`, `SMTP_*`, `EMAIL_FROM` | no | `mock` (default) or `smtp` delivery |
 | `TWILIO_*` | when mocks are off | Real WhatsApp sending |
@@ -197,13 +201,13 @@ Secrets live only in `.env` (git-ignored). Nothing is exposed to the browser.
 ## Testing
 
 ```bash
-npm test          # 94 tests, 8 files
+npm test          # 99 tests, 9 files
 npm run typecheck
 npm run lint
 npm run test:e2e  # real crawl + queue + worker + PDF, needs Postgres and Redis
 ```
 
-The suite covers URL normalisation and SSRF rejection (private IPs, IPv4-mapped IPv6, metadata hosts, redirect hops), signal extraction, all 26 checks, mock adapter determinism, AI JSON validation/repair, schedule date maths, authorization helpers, and report rendering/escaping/storage-key safety/page stamping. Results for the current tree are recorded in [COMPLETION-REPORT.md](COMPLETION-REPORT.md).
+The suite covers URL normalisation and SSRF rejection (private IPs, IPv4-mapped IPv6, metadata hosts, redirect hops), signal extraction, all 26 checks, mock adapter determinism, AI JSON validation/repair, schedule date maths, authorization helpers, report rendering/escaping/storage-key safety/page stamping, and both report-storage adapters (local path safety, Supabase bucket URL and server-side auth header). Results for the current tree are recorded in [COMPLETION-REPORT.md](COMPLETION-REPORT.md).
 
 ## Reports (Puppeteer)
 
@@ -213,17 +217,25 @@ The worker needs a Chromium binary:
 - Debian/Ubuntu worker host: `apt-get install -y chromium` (the Docker `worker` target already does this and points `PUPPETEER_EXECUTABLE_PATH` at it).
 - If no browser is found the audit fails with an explicit message; it never writes a placeholder PDF.
 
-PDFs are written through `src/report/storage.ts`. The default adapter is local disk. **On Vercel the filesystem is ephemeral**, so either run the worker where `.data/reports` is persistent (Docker volume) or implement the S3/R2 adapter — the interface is four methods. The web app and worker must share the same storage: the current local adapter only works when both run against the same volume, which is why the included worker image mounts `.data/reports`.
+PDFs are written and read through one boundary, `src/report/storage.ts`:
+
+- `local` (default) writes under `REPORT_DIR`. Valid for development and single-host Docker deployments where web and worker share a volume.
+- `supabase` uploads to a **private** Supabase Storage bucket over the REST API (no extra SDK) using `SUPABASE_SERVICE_ROLE_KEY`. This is the supported Vercel architecture: the worker writes the PDF, the Vercel web app streams it through the authorized `/api/reports/:id/download` route. Internal object keys are never exposed to clients.
+
+On Vercel the filesystem is ephemeral, so `REPORT_STORAGE=local` must not be used there.
 
 ## Deployment
 
 ### Web app → Vercel
 
-1. Import the repository; framework preset Next.js, build `npm run build`.
-2. Add `DATABASE_URL`, `AUTH_SECRET`, `CRON_SECRET`, `APP_URL` (your Vercel URL), `REDIS_URL`, `USE_MOCKS`, `AI_USE_MOCKS` (and `ANTHROPIC_API_KEY` if `AI_USE_MOCKS=false`).
-3. The `postinstall` script runs `prisma generate`, so the Prisma Client is built during the Vercel install step. `/api/health` and all data routes are dynamic, so the build never needs a live database.
-4. Run `npx prisma db push` against the production database once, from your machine.
-5. Deploy.
+Target architecture: **Vercel (Next.js) + Supabase/Neon Postgres + Upstash Redis + Supabase Storage + a persistent worker host + cron-job.org**. The BullMQ worker is never deployed as a Vercel function.
+
+1. Import the repository; the included `vercel.json` pins framework Next.js, `npm ci`, `npm run build`, region `iad1`. `postinstall` runs `prisma generate`, so Prisma Client is generated during install.
+2. Environment variables (Production + Preview): `DATABASE_URL`, `DIRECT_URL`, `AUTH_SECRET`, `CRON_SECRET`, `APP_URL` (the final Vercel URL), `REDIS_URL` (Upstash `rediss://`), `USE_MOCKS`, `AI_USE_MOCKS`, `REPORT_STORAGE=supabase`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_REPORT_BUCKET`. Add `ANTHROPIC_API_KEY` only when `AI_USE_MOCKS=false`.
+3. Create the private storage bucket (same name as `SUPABASE_REPORT_BUCKET`). Do not make it public: downloads are proxied by the authorized route.
+4. Apply the schema once from your machine against the production database: `npx prisma db push` (or `prisma migrate deploy` if you adopt migrations). Builds never mutate the database.
+5. Deploy. Then check `GET /api/health` → `status: "ok"` with `checks.storage: "supabase"`.
+6. API routes are dynamic and use the Node.js runtime; `/api/audits` and `/api/cron/schedules` declare `maxDuration = 60`. They enqueue work and return promptly — crawling, PDF generation and notifications stay in the worker.
 
 ### Worker → an always-on host
 
@@ -234,17 +246,17 @@ docker build --target worker -t edgelink-worker .
 docker run --env-file .env edgelink-worker     # runs `npm run worker`
 ```
 
-It needs `DATABASE_URL`, `REDIS_URL`, the report directory (persistent volume) and Chromium. It does not need `AUTH_SECRET`, and it must not be exposed publicly.
+It needs `DATABASE_URL`, `REDIS_URL`, `REPORT_STORAGE=supabase` + `SUPABASE_*` (or a persistent local volume), `USE_MOCKS`/`AI_USE_MOCKS`, and Chromium. It does not need `AUTH_SECRET`, and it must not be exposed publicly. SIGTERM/SIGINT close the BullMQ worker and Redis connection gracefully; startup runs a stuck-audit reconciliation sweep. Queue health is visible at `GET /api/health` and in Admin → Settings.
 
-`docker compose up --build` runs the whole stack (Postgres, Redis, migrate, web, worker) locally in production shape. The Docker targets were written for this project but could not be built in the development sandbox (the daemon had no route to Docker Hub); see [COMPLETION-REPORT.md](COMPLETION-REPORT.md) → Verification.
+`docker compose up --build` runs the whole stack (Postgres, Redis, migrate, web, worker) locally in production shape. The Docker targets could not be built in the earlier sandbox (no route to Docker Hub); see [COMPLETION-REPORT.md](COMPLETION-REPORT.md) → Verification.
 
 ### Monthly schedule → cron-job.org
 
-- Create a job: `POST https://<your-domain>/api/cron/schedules`
-- Header: `Authorization: Bearer <CRON_SECRET>`
-- Run hourly (or daily). The endpoint scans due schedules, claims each one with a conditional update (so duplicate cron hits cannot double-create audits), enqueues the audit and advances `nextRunAt`. It also runs the stuck-audit reconciliation sweep. It returns counts as JSON.
-
-Schedules are monthly on a day (1–28) and hour (UTC). Day clamping to 28 keeps February stable.
+- URL: `POST https://<your-domain>/api/cron/schedules`
+- Header: `Authorization: Bearer <CRON_SECRET>` (the `?secret=` query form is also accepted for providers that cannot set headers)
+- Schedule: hourly is sufficient and safe (monthly schedules are day+hour UTC; day is clamped to 1–28).
+- The endpoint scans due schedules, claims each with a conditional update on `nextRunAt` (duplicate/overlapping triggers cannot double-create audits), enqueues the audit, advances `nextRunAt`, and also reconciles stuck audits. It returns counts as JSON, normally in well under a second; crawling and PDF work happen in the worker.
+- Unauthenticated or invalid secrets return `401`. Missed runs are recovered on the next run because due schedules are selected by `nextRunAt <= now` (not by an exact-hour match).
 
 ## Security notes
 

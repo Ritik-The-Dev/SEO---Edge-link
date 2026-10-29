@@ -48,3 +48,5 @@ const handler = route(async (request) => {
 
 export const GET = handler
 export const POST = handler
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60

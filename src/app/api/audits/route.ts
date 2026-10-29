@@ -6,6 +6,10 @@ import { createAuditForWebsite } from '@/server/audits'
 import { auditCreateSchema } from '@/validation/schemas'
 import type { AuditStatus } from '@prisma/client'
 
+// Vercel (Node.js runtime) execution budget for enqueue + dedupe queries.
+export const maxDuration = 60
+export const dynamic = 'force-dynamic'
+
 export const GET = route(async (request) => {
   const user = await requireUser()
   const url = new URL(request.url)

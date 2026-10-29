@@ -142,34 +142,43 @@ export default async function LandingPage() {
     <div className="bg-canvas">
       <SiteHeader signedIn={Boolean(user)} />
 
+      <main id="main">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-line">
-        <div className="pointer-events-none absolute inset-0 grid-lines opacity-[0.4] [mask-image:radial-gradient(ellipse_at_50%_0%,black,transparent_72%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-radial-accent opacity-60" />
+        <div className="pointer-events-none absolute inset-0 grid-lines opacity-[0.35] [mask-image:radial-gradient(ellipse_at_50%_0%,black,transparent_72%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-radial-accent opacity-70" />
+        {/* Fine vertical accent line — left editorial marker */}
+        <div className="pointer-events-none absolute inset-y-0 left-[3%] hidden w-px bg-gradient-to-b from-transparent via-accent/20 to-transparent xl:block" />
 
-        <div className="relative mx-auto w-full max-w-[1280px] px-5 pb-16 pt-14 lg:px-8 lg:pb-24 lg:pt-20">
-          <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
+        <div className="relative mx-auto w-full max-w-[1280px] px-5 pb-16 pt-14 lg:px-8 lg:pb-28 lg:pt-22">
+          <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-8">
+            {/* Left — editorial copy column */}
             <div className="lg:col-span-5">
               <Reveal>
-                <div className="mb-7 flex items-center gap-3">
-                  <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-faint">01</span>
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-faint">01</span>
                   <span className="mono-label">Edgelink · SEO intelligence</span>
                   <span className="h-px flex-1 bg-line" />
+                  {/* Live status chip */}
+                  <span className="flex items-center gap-1.5 rounded-[3px] border border-accent/20 bg-accent-soft/40 px-2 py-0.5">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
+                    <span className="font-mono text-[0.5rem] uppercase tracking-[0.14em] text-accent/80">live</span>
+                  </span>
                 </div>
               </Reveal>
 
               <Reveal delay={0.05}>
-                <h1 className="font-display text-[3rem] leading-[0.94] tracking-[-0.02em] sm:text-[3.9rem] lg:text-[4.4rem]">
+                <h1 className="font-display text-[3.1rem] leading-[0.93] tracking-[-0.025em] sm:text-[4rem] lg:text-[4.6rem]">
                   Know what is
                   <br />
-                  <em className="italic text-accent">holding</em> your
+                  <em className="italic text-accent text-glow">holding</em> your
                   <br />
                   website back.
                 </h1>
               </Reveal>
 
               <Reveal delay={0.1}>
-                <p className="mt-6 max-w-md text-sm leading-relaxed text-muted">
+                <p className="mt-7 max-w-[400px] text-sm leading-relaxed text-muted">
                   Technical SEO intelligence, automated audits and actionable recommendations — one connected
                   workflow from crawl to a client-ready report. No ranking promises, just the signals that are
                   actually measurable.
@@ -190,7 +199,7 @@ export default async function LandingPage() {
               </Reveal>
 
               <Reveal delay={0.2}>
-                <div className="mt-9 grid max-w-md grid-cols-3 gap-px border-y border-line bg-line">
+                <div className="mt-9 grid max-w-[380px] grid-cols-3 gap-px border-y border-line bg-line">
                   {[
                     ['Crawl', 'fetch + cheerio'],
                     ['Analyse', 'claude / fixture'],
@@ -207,32 +216,39 @@ export default async function LandingPage() {
               </Reveal>
             </div>
 
+            {/* Right — observatory + score card */}
             <div className="lg:col-span-7">
-              <Reveal delay={0.1}>
+              <Reveal delay={0.08}>
                 <div className="relative">
-                  <div className="panel relative overflow-hidden">
-                    <div className="pointer-events-none absolute inset-0 grid-lines opacity-40" />
-                    <span className="pointer-events-none absolute left-2 top-2 z-10 h-3 w-3 border-l border-t border-accent/50" aria-hidden />
-                    <span className="pointer-events-none absolute right-2 top-2 z-10 h-3 w-3 border-r border-t border-accent/50" aria-hidden />
-                    <span className="pointer-events-none absolute bottom-2 left-2 z-10 h-3 w-3 border-b border-l border-accent/50" aria-hidden />
-                    <span className="pointer-events-none absolute bottom-2 right-2 z-10 h-3 w-3 border-b border-r border-accent/50" aria-hidden />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-24 flex-col justify-center gap-4 border-l border-line/60 bg-canvas/40 px-3 backdrop-blur-[1px] sm:flex">
+                  {/* Observatory frame */}
+                  <div className="panel relative overflow-hidden shadow-glow-accent">
+                    <div className="pointer-events-none absolute inset-0 grid-lines opacity-30" />
+                    {/* Corner registration marks */}
+                    <span className="pointer-events-none absolute left-2.5 top-2.5 z-10 h-4 w-4 border-l border-t border-accent/40" aria-hidden />
+                    <span className="pointer-events-none absolute right-2.5 top-2.5 z-10 h-4 w-4 border-r border-t border-accent/40" aria-hidden />
+                    <span className="pointer-events-none absolute bottom-2.5 left-2.5 z-10 h-4 w-4 border-b border-l border-accent/40" aria-hidden />
+                    <span className="pointer-events-none absolute bottom-2.5 right-2.5 z-10 h-4 w-4 border-b border-r border-accent/40" aria-hidden />
+                    {/* Metadata rail */}
+                    <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-[88px] flex-col justify-center gap-4 border-l border-line/60 bg-canvas/50 px-3 backdrop-blur-sm sm:flex">
                       {[
                         ['scan', 'active'],
-                        ['signals', '15'],
-                        ['depth', '2.4k'],
+                        ['signals', '8'],
+                        ['checks', '26'],
                         ['mode', 'fixture'],
                       ].map(([label, value]) => (
                         <div key={label}>
-                          <div className="font-mono text-[0.5rem] uppercase tracking-[0.14em] text-faint">{label}</div>
-                          <div className="mt-0.5 font-mono text-[0.6rem] text-ink">{value}</div>
+                          <div className="font-mono text-[0.48rem] uppercase tracking-[0.14em] text-faint">{label}</div>
+                          <div className="mt-0.5 font-mono text-[0.62rem] text-ink">{value}</div>
                         </div>
                       ))}
                     </div>
+                    {/* Accent accent top stripe */}
+                    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
                     <SignalObservatory className="relative aspect-[5/4] w-full" />
                   </div>
 
-                  <div className="relative z-10 mx-3 -mt-10 rounded-md border border-line bg-surface/95 p-4 shadow-lift backdrop-blur sm:mx-6">
+                  {/* Floating score card */}
+                  <div className="relative z-10 mx-3 -mt-12 rounded-md border border-line bg-surface/95 p-4 shadow-lift backdrop-blur-sm sm:mx-6">
                     <div className="flex items-center justify-between gap-3">
                       <span className="mono-label">Audit result · sample</span>
                       <StatusPill status="COMPLETED" />
@@ -258,12 +274,12 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Signal ribbon */}
-      <div className="overflow-hidden border-b border-line bg-surface/40">
-        <div className="mx-auto flex w-full max-w-[1280px] flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3.5 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-faint lg:px-8">
+      {/* Signal ribbon — scrolling ticker */}
+      <div className="overflow-hidden border-b border-line bg-surface/50">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3 font-mono text-[0.56rem] uppercase tracking-[0.16em] text-faint lg:px-8">
           {SIGNALS.map((signal, index) => (
             <span key={signal} className="flex items-center gap-2">
-              {index > 0 ? <span className="h-1 w-1 rounded-full bg-line" aria-hidden /> : null}
+              {index > 0 ? <span className="h-[3px] w-[3px] rounded-full bg-line" aria-hidden /> : null}
               {signal}
             </span>
           ))}
@@ -549,19 +565,31 @@ export default async function LandingPage() {
 
       {/* Final CTA */}
       <section className="relative overflow-hidden border-b border-line">
-        <div className="pointer-events-none absolute inset-0 bg-radial-accent opacity-70" />
-        <div className="pointer-events-none absolute inset-0 grid-lines opacity-20 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
-        <div className="relative mx-auto w-full max-w-[1280px] px-5 py-24 text-center lg:px-8 lg:py-32">
+        <div className="pointer-events-none absolute inset-0 bg-radial-accent opacity-80" />
+        <div className="pointer-events-none absolute inset-0 grid-lines opacity-[0.15] [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]" />
+        {/* Large background letterform */}
+        <div
+          className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
+          aria-hidden
+        >
+          <span className="font-display text-[22rem] font-normal leading-none tracking-[-0.04em] text-accent/[0.04] sm:text-[28rem]">
+            EL
+          </span>
+        </div>
+        <div className="relative mx-auto w-full max-w-[1280px] px-5 py-24 text-center lg:px-8 lg:py-36">
           <Reveal>
             <div className="mono-label">Ready when your next client is</div>
-            <h2 className="mx-auto mt-5 max-w-2xl font-display text-[2.6rem] leading-[1] tracking-[-0.015em] sm:text-[3.6rem]">
-              Run the audit. See the <em className="italic text-accent">signals</em>.
+            <h2 className="mx-auto mt-5 max-w-3xl font-display text-[2.8rem] leading-[0.97] tracking-[-0.02em] sm:text-[4rem]">
+              Run the audit.
+              <br />
+              See the{' '}
+              <em className="italic text-accent text-glow-strong">signals</em>.
             </h2>
-            <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-muted">
+            <p className="mx-auto mt-6 max-w-lg text-sm leading-relaxed text-muted">
               Start with a single-page technical audit, inspect the measured evidence, and deliver a report with the
               fixes ordered by impact and effort.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg">
                 <Link href="/app/audits/new">
                   Run an SEO audit <ArrowRight className="h-4 w-4" />
@@ -571,12 +599,13 @@ export default async function LandingPage() {
                 <Link href="/login">Sign in to the workspace</Link>
               </Button>
             </div>
-            <p className="mt-6 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-faint">
-              Runs in mock mode by default · live Claude opt-in
+            <p className="mt-7 font-mono text-[0.56rem] uppercase tracking-[0.18em] text-faint">
+              Runs in mock mode by default &middot; live Claude opt-in &middot; 99 passing tests
             </p>
           </Reveal>
         </div>
       </section>
+      </main>
 
       <SiteFooter />
     </div>

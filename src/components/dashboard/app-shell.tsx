@@ -140,20 +140,26 @@ export function AppShell({
             collapsed ? 'w-[68px]' : 'w-[248px]',
           )}
         >
-          <div className={cn('flex h-16 items-center border-b border-line', collapsed ? 'justify-center px-2' : 'px-5')}>
+          {/* Sidebar brand header */}
+          <div
+            className={cn(
+              'flex h-16 items-center border-b border-line',
+              collapsed ? 'justify-center px-2' : 'px-5',
+            )}
+          >
             {collapsed ? (
-              <Link href={variant === 'admin' ? '/app' : '/client'} aria-label="EdgeLink home">
+              <Link href={variant === 'admin' ? '/app' : '/client'}>
                 <Wordmark compact className="[&>span:last-child]:hidden" />
               </Link>
             ) : (
-              <Link href={variant === 'admin' ? '/app' : '/client'} aria-label="EdgeLink workspace">
+              <Link href={variant === 'admin' ? '/app' : '/client'}>
                 <Wordmark />
               </Link>
             )}
           </div>
 
-          <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label="Primary">
-            {!collapsed ? <div className="mono-label px-2 pb-2 pt-1">Workspace</div> : null}
+          <nav className="flex-1 space-y-0.5 overflow-y-auto p-2.5" aria-label="Primary">
+            {!collapsed ? <div className="mono-label px-2.5 pb-2.5 pt-1.5">Workspace</div> : null}
             {nav.map((item) => {
               const active = isActive(item.href)
               return (
@@ -162,21 +168,33 @@ export function AppShell({
                   href={item.href}
                   title={collapsed ? item.label : undefined}
                   className={cn(
-                    'group relative flex items-center gap-3 rounded-sm px-2.5 py-2 text-[0.8rem] transition-colors',
-                    active ? 'bg-raised text-ink' : 'text-muted hover:bg-raised/60 hover:text-ink',
+                    'group relative flex items-center gap-3 rounded-sm px-2.5 py-2.5 text-[0.8rem] transition-all duration-150',
+                    active
+                      ? 'bg-raised text-ink'
+                      : 'text-muted hover:bg-raised/70 hover:text-ink',
                     collapsed && 'justify-center px-0',
                   )}
                   aria-current={active ? 'page' : undefined}
                 >
-                  {active ? <span className="absolute inset-y-1.5 left-0 w-[2px] rounded-full bg-accent" /> : null}
-                  <item.icon className={cn('h-4 w-4 shrink-0', active ? 'text-accent' : 'text-faint group-hover:text-muted')} />
-                  {!collapsed ? <span>{item.label}</span> : null}
+                  {active ? <span className="nav-active-bar" /> : null}
+                  <item.icon
+                    className={cn(
+                      'h-4 w-4 shrink-0 transition-colors',
+                      active ? 'text-accent' : 'text-faint group-hover:text-muted',
+                    )}
+                  />
+                  {!collapsed ? (
+                    <span className={cn('flex-1 truncate', active && 'font-medium')}>{item.label}</span>
+                  ) : null}
+                  {active && !collapsed ? (
+                    <span className="h-1 w-1 rounded-full bg-accent opacity-70" aria-hidden />
+                  ) : null}
                 </Link>
               )
             })}
           </nav>
 
-          <div className="border-t border-line p-3">
+          <div className="border-t border-line p-2.5">
             {!collapsed ? (
               <div className="mb-2 flex items-center gap-1.5 px-2">
                 <Badge tone="accent" mono>

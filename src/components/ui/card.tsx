@@ -53,11 +53,11 @@ export function Stat({
   className?: string
 }) {
   return (
-    <div className={cn('border-line px-5 py-4', className)}>
+    <div className={cn('stat-card border-line px-5 py-5', className)}>
       <div className="mono-label">{label}</div>
       <div
         className={cn(
-          'mt-2 font-display text-3xl leading-none tracking-[-0.01em]',
+          'mt-2.5 font-display text-3xl leading-none tracking-[-0.015em]',
           tone === 'accent' && 'text-accent',
           tone === 'warn' && 'text-warn',
           tone === 'critical' && 'text-critical',
@@ -65,7 +65,7 @@ export function Stat({
       >
         {value}
       </div>
-      {hint ? <div className="mt-1.5 text-xs text-muted">{hint}</div> : null}
+      {hint ? <div className="mt-2 text-xs leading-relaxed text-muted">{hint}</div> : null}
     </div>
   )
 }

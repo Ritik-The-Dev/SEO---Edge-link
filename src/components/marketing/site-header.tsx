@@ -34,7 +34,7 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
       )}
     >
       <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between gap-6 px-5 lg:px-8">
-        <Link href="/" aria-label="EdgeLink home">
+        <Link href="/">
           <Wordmark />
         </Link>
 

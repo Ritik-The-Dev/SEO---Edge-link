@@ -27,8 +27,12 @@ const envSchema = z.object({
   ANTHROPIC_MODEL: z.string().default('claude-sonnet-4-6'),
   PAGESPEED_API_KEY: z.string().optional().default(''),
 
-  REPORT_STORAGE: z.enum(['local']).default('local'),
+  REPORT_STORAGE: z.enum(['local', 'supabase']).default('local'),
   REPORT_DIR: z.string().default('.data/reports'),
+  // Server-only Supabase Storage credentials (never NEXT_PUBLIC_*).
+  SUPABASE_URL: z.string().optional().default(''),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional().default(''),
+  SUPABASE_REPORT_BUCKET: z.string().default('reports'),
   PUPPETEER_EXECUTABLE_PATH: z.string().optional().default(''),
   PUPPETEER_HEADLESS: z
     .string()

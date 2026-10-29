@@ -97,7 +97,7 @@ export function ScorePill({
       )}
     >
       {score ?? '—'}
-      {score !== null && score !== undefined ? <span className="text-[0.65em] opacity-60">/100</span> : null}
+      {score !== null && score !== undefined ? <span className="text-[0.65em] text-faint">/100</span> : null}
     </span>
   )
 }

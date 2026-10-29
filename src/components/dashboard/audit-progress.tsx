@@ -106,18 +106,30 @@ export function AuditProgress({ auditId, initial }: { auditId: string; initial: 
                 <div
                   className={
                     state === 'done'
-                      ? 'h-[2px] w-full bg-accent'
+                      ? 'h-[2px] w-full rounded-full bg-accent'
                       : state === 'active'
-                        ? 'h-[2px] w-full bg-accent/60'
-                        : 'h-[2px] w-full bg-line'
+                        ? 'relative h-[2px] w-full rounded-full bg-accent/50'
+                        : 'h-[2px] w-full rounded-full bg-line'
                   }
-                />
+                  style={
+                    state === 'active'
+                      ? { boxShadow: '0 0 6px 1px hsl(160 74% 51% / 0.5)' }
+                      : undefined
+                  }
+                >
+                  {state === 'active' ? (
+                    <span
+                      className="absolute -right-0.5 -top-[3px] h-2 w-2 rounded-full bg-accent animate-pulse"
+                      style={{ boxShadow: '0 0 8px 2px hsl(160 74% 51% / 0.7)' }}
+                    />
+                  ) : null}
+                </div>
                 <div
                   className={
                     state === 'active'
-                      ? 'mt-2 truncate text-[0.65rem] text-ink'
+                      ? 'mt-2 truncate text-[0.65rem] font-medium text-ink'
                       : state === 'done'
-                        ? 'mt-2 truncate text-[0.65rem] text-muted'
+                        ? 'mt-2 truncate text-[0.65rem] text-accent/70'
                         : 'mt-2 truncate text-[0.65rem] text-faint'
                   }
                 >

@@ -65,7 +65,7 @@ Commands were run in this checkout on 29 Oct 2026. Nothing below is inferred.
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Unit + integration tests | `npm test` (`vitest run`) | **PASS** — 8 files, **94 tests**, 0 failures |
+| Unit + integration tests | `npm test` (`vitest run`) | **PASS** - 9 files, **99 tests**, 0 failures |
 | TypeScript | `npx tsc --noEmit` | **PASS** — no errors |
 | Lint | `npm run lint` | **PASS** — no warnings or errors |
 | Production build | `npm run build` | **PASS** — `Compiled successfully`, all routes emitted; also passed after the final code change |
@@ -205,6 +205,38 @@ Second pass focused on art direction, responsive layout and deployment readiness
 
 **Still not verified:** no Vercel deploy (no account/token here), no Docker image (Docker Hub DNS blocked), no live Claude or third-party calls (no credentials).
 
+## 8c. Release-readiness pass (third pass)
+
+Scope: durable report storage for Vercel, runtime budgets, accessibility, and an honest re-verification. No backend behaviour was replaced.
+
+**Changed**
+
+- `src/report/storage.ts`: added a **Supabase Storage** adapter (fetch-based Storage REST API, private bucket, service-role key server-only) next to the existing local adapter. `reportStorage()` validates credentials at the runtime boundary and fails with an explicit message. Worker uploads and web downloads now share one abstraction.
+- `src/lib/env.ts`: `REPORT_STORAGE=local|supabase` plus `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_REPORT_BUCKET` (documented in `.env.example`; never `NEXT_PUBLIC_*`).
+- `GET /api/health` now reports the active storage adapter and degrades when it is misconfigured.
+- `vercel.json` reduced to the supported deployment contract; `maxDuration = 60` + `force-dynamic` on `/api/audits` and `/api/cron/schedules`.
+- Accessibility: added `<main>` landmarks (landing, login), replaced the broken `dl > div > div` metric list with valid per-row `<dl>` groups, removed aria-labels that did not contain the visible brand text, and raised `--faint-ink` contrast.
+- Added `src/tests/storage.test.ts` (key safety, filename derivation, traversal rejection, Supabase upload URL/auth header, missing-credential error).
+
+**Re-run after the changes**
+
+| Check | Result |
+| --- | --- |
+| `npx tsc --noEmit` | PASS |
+| `npm run lint` | PASS — no warnings |
+| `npm test` | PASS — **99 tests / 9 files** |
+| `npx prisma validate` | PASS |
+| `npm run build` | PASS — compiled, 24 routes generated |
+| `npm start` (production server, port 3100) | `/` 200, `/login` 200, `/api/health` 200 `status: ok` |
+| `npm run test:e2e` | PASS — 26 checks, PDF 232,090 bytes, notifications `WHATSAPP:MOCKED`, `EMAIL:MOCKED` |
+| Cron unauthenticated / authorized | 401 / 200 (`scanned: 0`) |
+| Client portal scoping | client sees own audits; `/app` redirects to `/client`; report download 200 `application/pdf`, 232,182 bytes |
+| Lighthouse (mobile emulation) `/` | Accessibility **100**, Best Practices **100**, SEO **100** |
+| Lighthouse `/login` | Accessibility **100**, Best Practices **100**, SEO **100** |
+| Console errors (landing, login, `/app`, audits, clients, schedules, settings, client portal) | none |
+
+**Not verified:** no Vercel deployment (no token/authorization in this environment), no Docker image build (Docker Hub access was unavailable in the earlier pass and was not retried here), no live Claude/PageSpeed/Twilio/SMTP calls (no credentials). Screenshots could not be captured (the browser tab must be visible to the desktop); inspection used DOM/accessibility snapshots, console capture, HTTP probes and Lighthouse.
+
 ## 9. Submission checklist
 
 | Item | State |
@@ -221,6 +253,6 @@ Second pass focused on art direction, responsive layout and deployment readiness
 | WhatsApp mock + email adapter | done, attempts recorded |
 | Monthly schedule + protected cron | done, 401/200 verified |
 | `.env.example`, README, Dockerfile, compose | done |
-| Tests / typecheck / lint / build | all passing, results above |
-| Deployment | **not performed** |
+| Tests / typecheck / lint / build | all passing: 99 tests / 9 files, tsc, lint, production build |
+| Deployment | **ready, not deployed** — no Vercel token/authorization in this environment |
 | Demo recording | **not recorded** |

@@ -162,13 +162,13 @@ export function ProductConsole() {
           <div className="border-b border-line px-4 py-2.5 sm:px-5">
             <span className="mono-label">Measured signals</span>
           </div>
-          <dl className="divide-y divide-line">
+          <div className="divide-y divide-line">
             {METRICS.map((metric) => (
               <div key={metric.label} className="px-4 py-2.5 sm:px-5">
-                <div className="flex items-baseline justify-between gap-2">
+                <dl className="flex items-baseline justify-between gap-2">
                   <dt className="font-mono text-[0.58rem] uppercase tracking-[0.12em] text-faint">{metric.label}</dt>
                   <dd className="font-mono text-xs tabular-nums text-ink">{metric.value}</dd>
-                </div>
+                </dl>
                 <div className="mt-1.5 h-0.5 w-full overflow-hidden rounded-full bg-line/70">
                   <div
                     className={
@@ -186,7 +186,7 @@ export function ProductConsole() {
                 </div>
               </div>
             ))}
-          </dl>
+          </div>
 
           <div className="px-4 py-3 sm:px-5">
             <div className="rounded-[3px] border border-line bg-canvas p-2.5">

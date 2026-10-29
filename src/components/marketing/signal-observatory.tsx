@@ -11,14 +11,29 @@ import { cn } from '@/lib/utils'
  * capped at 2x DPR, and rendered as a single static frame when the visitor
  * prefers reduced motion. Colours are read from the live design tokens so the
  * visual follows the theme.
+ *
+ * V2: Added coloured signal sectors (technical, performance, content, schema),
+ * dual orbital rings with different inclinations, a radial measurement arc,
+ * animated scan pulse, and more coordinate ticks.
  */
-const SIGNALS = [
-  { label: 'LCP', lat: 22, lon: 18 },
-  { label: 'CLS', lat: -38, lon: 96 },
-  { label: 'JSON-LD', lat: 52, lon: 204 },
-  { label: 'H1', lat: -8, lon: 286 },
-  { label: 'SITEMAP', lat: 44, lon: 66 },
-  { label: 'CANONICAL', lat: -52, lon: 236 },
+
+interface SignalPoint {
+  label: string
+  lat: number
+  lon: number
+  category: 'technical' | 'performance' | 'content' | 'schema'
+  status: 'pass' | 'warn' | 'fail'
+}
+
+const SIGNALS: SignalPoint[] = [
+  { label: 'LCP', lat: 22, lon: 18, category: 'performance', status: 'fail' },
+  { label: 'CLS', lat: -38, lon: 96, category: 'performance', status: 'pass' },
+  { label: 'JSON-LD', lat: 52, lon: 204, category: 'schema', status: 'fail' },
+  { label: 'H1', lat: -8, lon: 286, category: 'content', status: 'fail' },
+  { label: 'SITEMAP', lat: 44, lon: 66, category: 'technical', status: 'pass' },
+  { label: 'CANONICAL', lat: -52, lon: 236, category: 'technical', status: 'warn' },
+  { label: 'INP', lat: -18, lon: 142, category: 'performance', status: 'warn' },
+  { label: 'ROBOTS', lat: 30, lon: 320, category: 'technical', status: 'pass' },
 ]
 
 function token(name: string, fallback: string): string {
@@ -40,6 +55,18 @@ export function SignalObservatory({ className }: { className?: string }) {
     const ink = token('--ink', '42 24% 93%')
     const line = token('--line', '155 8% 16%')
     const mutedInk = token('--muted-ink', '150 6% 62%')
+    const warn = token('--warn', '38 78% 62%')
+    const critical = token('--critical', '7 70% 62%')
+    const info = token('--info', '199 68% 64%')
+
+    // Category → colour mapping
+    const categoryColor = {
+      technical: accent,
+      performance: warn,
+      content: critical,
+      schema: info,
+    }
+    const statusAlpha = { pass: 0.95, warn: 0.85, fail: 0.80 }
 
     let width = 0
     let height = 0
@@ -50,6 +77,7 @@ export function SignalObservatory({ className }: { className?: string }) {
     let targetTilt = -0.12
     let visible = true
     let lastFrame = 0
+    let scanAngle = 0
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect()
@@ -95,15 +123,15 @@ export function SignalObservatory({ className }: { className?: string }) {
       const spin = angle
       ctx.clearRect(0, 0, width, height)
 
-      // Ambient halo
-      const glow = ctx.createRadialGradient(width / 2, height / 2, radius * 0.1, width / 2, height / 2, radius * 2.2)
-      glow.addColorStop(0, `hsl(${accent} / 0.10)`)
-      glow.addColorStop(0.55, `hsl(${accent} / 0.03)`)
+      // ── Ambient halo ──────────────────────────────────────────────
+      const glow = ctx.createRadialGradient(width / 2, height / 2, radius * 0.1, width / 2, height / 2, radius * 2.4)
+      glow.addColorStop(0, `hsl(${accent} / 0.12)`)
+      glow.addColorStop(0.45, `hsl(${accent} / 0.04)`)
       glow.addColorStop(1, 'transparent')
       ctx.fillStyle = glow
       ctx.fillRect(0, 0, width, height)
 
-      // Crosshair + concentric guides
+      // ── Concentric guide rings (3) ────────────────────────────────
       ctx.strokeStyle = `hsl(${line} / 0.7)`
       ctx.lineWidth = 1
       for (const factor of [0.42, 0.72, 1.0]) {
@@ -112,15 +140,24 @@ export function SignalObservatory({ className }: { className?: string }) {
         ctx.stroke()
       }
 
-      ctx.strokeStyle = `hsl(${line} / 0.55)`
+      // Faint outer measurement ring
+      ctx.strokeStyle = `hsl(${accent} / 0.12)`
+      ctx.lineWidth = 1
       ctx.beginPath()
-      ctx.moveTo(width / 2 - radius * 1.22, height / 2)
-      ctx.lineTo(width / 2 + radius * 1.22, height / 2)
-      ctx.moveTo(width / 2, height / 2 - radius * 1.22)
-      ctx.lineTo(width / 2, height / 2 + radius * 1.22)
+      ctx.ellipse(width / 2, height / 2, radius * 1.32, radius * 1.32 * 0.985, 0, 0, Math.PI * 2)
       ctx.stroke()
 
-      // Sphere point field: latitude rings + meridians
+      // ── Crosshair ─────────────────────────────────────────────────
+      ctx.strokeStyle = `hsl(${line} / 0.55)`
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(width / 2 - radius * 1.4, height / 2)
+      ctx.lineTo(width / 2 + radius * 1.4, height / 2)
+      ctx.moveTo(width / 2, height / 2 - radius * 1.4)
+      ctx.lineTo(width / 2, height / 2 + radius * 1.4)
+      ctx.stroke()
+
+      // ── Point field ───────────────────────────────────────────────
       const drawField = (latRange: number[], lonRange: number[], dotSize: number, alphaBase: number, hue: string) => {
         for (const lat of latRange) {
           for (const lon of lonRange) {
@@ -144,7 +181,7 @@ export function SignalObservatory({ className }: { className?: string }) {
         mutedInk,
       )
 
-      // Scan meridian
+      // ── Scan meridian (animated) ───────────────────────────────────
       ctx.beginPath()
       for (let i = 0; i <= 60; i += 1) {
         const lat = -90 + i * 3
@@ -152,24 +189,39 @@ export function SignalObservatory({ className }: { className?: string }) {
         if (i === 0) ctx.moveTo(point.x, point.y)
         else ctx.lineTo(point.x, point.y)
       }
-      ctx.strokeStyle = `hsl(${accent} / 0.34)`
-      ctx.lineWidth = 1.1
+      ctx.strokeStyle = `hsl(${accent} / 0.38)`
+      ctx.lineWidth = 1.2
       ctx.stroke()
 
-      // Orbit (tilted ring)
-      const orbitRadius = radius * 1.28
-      ctx.beginPath()
-      for (let i = 0; i <= 90; i += 1) {
-        const lon = (i / 90) * 360
-        const p = project(0, lon, orbitRadius, spin * 0.6, tilt + 0.42)
-        if (i === 0) ctx.moveTo(p.x, p.y)
-        else ctx.lineTo(p.x, p.y)
+      // ── Scan pulse glow on the meridian ───────────────────────────
+      if (!reduceMotion) {
+        const scanLat = -90 + ((scanAngle % 180) / 180) * 180
+        const scanPoint = project(scanLat, 0, radius, spin, tilt)
+        const pulseGlow = ctx.createRadialGradient(scanPoint.x, scanPoint.y, 0, scanPoint.x, scanPoint.y, radius * 0.22)
+        pulseGlow.addColorStop(0, `hsl(${accent} / 0.28)`)
+        pulseGlow.addColorStop(1, 'transparent')
+        ctx.fillStyle = pulseGlow
+        ctx.fillRect(0, 0, width, height)
       }
-      ctx.strokeStyle = `hsl(${accent} / 0.22)`
-      ctx.lineWidth = 1
-      ctx.stroke()
 
-      // Signal links: faint arcs between adjacent markers on the near face
+      // ── Primary orbit ring (tilted) ────────────────────────────────
+      const drawOrbit = (inclinationOffset: number, speedFactor: number, alpha: number, lw: number) => {
+        const orbitRadius = radius * 1.28
+        ctx.beginPath()
+        for (let i = 0; i <= 90; i += 1) {
+          const lon = (i / 90) * 360
+          const p = project(0, lon, orbitRadius, spin * speedFactor, tilt + inclinationOffset)
+          if (i === 0) ctx.moveTo(p.x, p.y)
+          else ctx.lineTo(p.x, p.y)
+        }
+        ctx.strokeStyle = `hsl(${accent} / ${alpha})`
+        ctx.lineWidth = lw
+        ctx.stroke()
+      }
+      drawOrbit(0.42, 0.6, 0.22, 1)
+      drawOrbit(1.1, 0.35, 0.1, 0.8)
+
+      // ── Signal arc links ───────────────────────────────────────────
       ctx.lineWidth = 1
       for (let i = 0; i < SIGNALS.length; i += 1) {
         const from = SIGNALS[i]
@@ -185,71 +237,109 @@ export function SignalObservatory({ className }: { className?: string }) {
         ctx.beginPath()
         ctx.moveTo(a.x, a.y)
         ctx.quadraticCurveTo(controlX, controlY, b.x, b.y)
-        ctx.strokeStyle = `hsl(${accent} / 0.16)`
+        ctx.strokeStyle = `hsl(${accent} / 0.14)`
         ctx.stroke()
       }
 
-      // Coordinate ticks around the outer ring
-      for (let i = 0; i < 84; i += 1) {
-        const theta = (i / 84) * Math.PI * 2
-        const major = i % 7 === 0
-        const inner = radius * 1.1
-        const outer = radius * (major ? 1.19 : 1.15)
+      // ── Coordinate ticks ───────────────────────────────────────────
+      for (let i = 0; i < 120; i += 1) {
+        const theta = (i / 120) * Math.PI * 2
+        const major = i % 10 === 0
+        const mid = i % 5 === 0
+        const inner = radius * 1.09
+        const outer = radius * (major ? 1.21 : mid ? 1.17 : 1.14)
         ctx.beginPath()
         ctx.moveTo(width / 2 + Math.cos(theta) * inner, height / 2 + Math.sin(theta) * inner)
         ctx.lineTo(width / 2 + Math.cos(theta) * outer, height / 2 + Math.sin(theta) * outer)
-        ctx.strokeStyle = `hsl(${major ? accent : line} / ${major ? 0.34 : 0.5})`
+        ctx.strokeStyle = `hsl(${major ? accent : line} / ${major ? 0.42 : 0.45})`
+        ctx.lineWidth = major ? 1.2 : 0.8
         ctx.stroke()
       }
 
-      // Signal markers on the sphere
+      // Degree labels at major ticks
+      ctx.fillStyle = `hsl(${accent} / 0.4)`
+      ctx.font = '7px ui-monospace, SFMono-Regular, Menlo, monospace'
+      ctx.textAlign = 'center'
+      for (let i = 0; i < 12; i += 1) {
+        const theta = (i / 12) * Math.PI * 2 - Math.PI / 2
+        const deg = i * 30
+        const r = radius * 1.27
+        ctx.fillText(`${deg}°`, width / 2 + Math.cos(theta) * r, height / 2 + Math.sin(theta) * r + 3)
+      }
+
+      // ── Signal markers ─────────────────────────────────────────────
       SIGNALS.forEach((signal, index) => {
         const point = project(signal.lat, signal.lon, radius * 1.02, spin, tilt)
         const facing = point.depth > 0.46
-        const alpha = facing ? 0.95 : 0.22
-        const markerSize = 2.6 * point.scale
+        const alpha = facing ? statusAlpha[signal.status] : 0.2
+        const markerSize = 2.8 * point.scale
+        const colour = categoryColor[signal.category]
 
-        ctx.strokeStyle = `hsl(${accent} / ${(alpha * 0.5).toFixed(2)})`
-        ctx.lineWidth = 1
+        // Outer ring
+        ctx.strokeStyle = `hsl(${colour} / ${(alpha * 0.45).toFixed(2)})`
+        ctx.lineWidth = 0.9
         ctx.beginPath()
-        ctx.arc(point.x, point.y, markerSize * 3.4, 0, Math.PI * 2)
+        ctx.arc(point.x, point.y, markerSize * 3.6, 0, Math.PI * 2)
         ctx.stroke()
 
-        ctx.fillStyle = `hsl(${accent} / ${alpha.toFixed(2)})`
+        // Fill dot (status-tinted)
+        ctx.fillStyle = `hsl(${colour} / ${alpha.toFixed(2)})`
         ctx.beginPath()
         ctx.arc(point.x, point.y, markerSize, 0, Math.PI * 2)
         ctx.fill()
 
+        // Label leader line and text for near-face signals
         if (facing) {
           const label = signal.label
           const right = point.x < width / 2
           const dir = right ? 1 : -1
-          const elbowX = point.x + dir * 26
-          const elbowY = point.y - 16 - (index % 2) * 3
+          const elbowX = point.x + dir * 28
+          const elbowY = point.y - 18 - (index % 3) * 4
 
-          ctx.strokeStyle = `hsl(${accent} / 0.32)`
+          ctx.strokeStyle = `hsl(${colour} / 0.35)`
+          ctx.lineWidth = 0.9
           ctx.beginPath()
-          ctx.moveTo(point.x + dir * markerSize * 1.6, point.y)
+          ctx.moveTo(point.x + dir * markerSize * 1.8, point.y)
           ctx.lineTo(elbowX, elbowY)
-          ctx.lineTo(elbowX + dir * 16, elbowY)
+          ctx.lineTo(elbowX + dir * 18, elbowY)
           ctx.stroke()
 
-          ctx.fillStyle = `hsl(${ink} / 0.72)`
+          ctx.fillStyle = `hsl(${ink} / 0.75)`
           ctx.font = '9px ui-monospace, SFMono-Regular, Menlo, monospace'
           ctx.textAlign = dir === 1 ? 'left' : 'right'
-          ctx.fillText(label, elbowX + dir * 20, elbowY + 3)
+          ctx.fillText(label, elbowX + dir * 22, elbowY + 3)
+
+          // Status indicator dot next to label
+          const statusColour =
+            signal.status === 'pass' ? accent : signal.status === 'warn' ? warn : critical
+          ctx.fillStyle = `hsl(${statusColour} / 0.8)`
+          ctx.beginPath()
+          ctx.arc(
+            dir === 1 ? elbowX + dir * 22 + ctx.measureText(label).width + 4 : elbowX + dir * 22 - ctx.measureText(label).width - 4,
+            elbowY + 0.5,
+            2,
+            0,
+            Math.PI * 2,
+          )
+          ctx.fill()
         }
       })
 
-      // Centre reticle
-      ctx.strokeStyle = `hsl(${accent} / 0.5)`
+      // ── Centre reticle ─────────────────────────────────────────────
+      ctx.strokeStyle = `hsl(${accent} / 0.55)`
       ctx.lineWidth = 1
       ctx.beginPath()
       ctx.arc(width / 2, height / 2, 3, 0, Math.PI * 2)
       ctx.stroke()
+      // Inner fill
+      ctx.fillStyle = `hsl(${accent} / 0.3)`
+      ctx.beginPath()
+      ctx.arc(width / 2, height / 2, 1.5, 0, Math.PI * 2)
+      ctx.fill()
 
       if (!reduceMotion) {
         angle += 0.0022
+        scanAngle += 1.2
         tilt += (targetTilt - tilt) * 0.04
       }
     }
@@ -298,7 +388,22 @@ export function SignalObservatory({ className }: { className?: string }) {
       <canvas ref={canvasRef} className="h-full w-full" aria-hidden />
       <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
-          <span className="mono-label">Signal observatory</span>
+          <div>
+            <span className="mono-label">Signal observatory</span>
+            <div className="mt-1.5 flex items-center gap-2.5">
+              {[
+                { label: 'Technical', col: 'bg-accent' },
+                { label: 'Performance', col: 'bg-warn' },
+                { label: 'Content', col: 'bg-critical' },
+                { label: 'Schema', col: 'bg-info' },
+              ].map((cat) => (
+                <span key={cat.label} className="flex items-center gap-1">
+                  <span className={`h-1.5 w-1.5 rounded-full ${cat.col} opacity-70`} aria-hidden />
+                  <span className="font-mono text-[0.46rem] uppercase tracking-[0.12em] text-faint">{cat.label}</span>
+                </span>
+              ))}
+            </div>
+          </div>
           <span className="rounded-[3px] border border-line bg-surface/80 px-2 py-0.5 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-faint">
             Sample
           </span>

@@ -21,7 +21,7 @@ export default async function LoginPage() {
       <div className="relative hidden overflow-hidden border-r border-line bg-surface lg:flex lg:flex-col lg:justify-between">
         <div className="pointer-events-none absolute inset-0 grid-lines opacity-30" />
         <div className="relative flex items-center justify-between p-8">
-          <Link href="/" aria-label="EdgeLink home">
+          <Link href="/">
             <Wordmark />
           </Link>
           <Badge tone="outline" mono>
@@ -47,7 +47,7 @@ export default async function LoginPage() {
         </div>
       </div>
 
-      <div className="flex min-h-screen flex-col justify-center px-5 py-12 sm:px-10 lg:px-16">
+      <main id="main" className="flex min-h-screen flex-col justify-center px-5 py-12 sm:px-10 lg:px-16">
         <div className="mx-auto w-full max-w-sm">
           <Link href="/" className="mb-10 inline-flex items-center gap-2 text-xs text-faint transition-colors hover:text-ink lg:hidden">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to site
@@ -88,7 +88,7 @@ export default async function LoginPage() {
             </div>
           ) : null}
         </div>
-      </div>
+      </main>
     </div>
   )
 }
