@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# env — never commit credentials
+.env
+.env.local
+.env.*.local
+.env.production
+
+# next
+.next/
+out/
+next-env.d.ts
+
+# build / test
+coverage/
+*.tsbuildinfo
+dist/
+
+# local runtime data
+.data/
+reports/
+*.pdf.tmp
+tmp/
+
+# logs
+*.log
+npm-debug.log*
+worker.log
+
+# os
+.DS_Store
+Thumbs.db
+
+# editors
+.vscode/
+.idea/
