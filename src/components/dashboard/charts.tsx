@@ -38,15 +38,41 @@ export function Sparkline({
     >
       <defs>
         <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.22" />
+          <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.30" />
+          <stop offset="60%" stopColor="hsl(var(--accent))" stopOpacity="0.08" />
           <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0" />
         </linearGradient>
+        <filter id="spark-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
       <path d={area} fill="url(#spark-fill)" />
-      <polyline points={points.join(' ')} fill="none" stroke="hsl(var(--accent))" strokeWidth="1.4" strokeLinejoin="round" />
+      <polyline
+        points={points.join(' ')}
+        fill="none"
+        stroke="hsl(var(--accent))"
+        strokeWidth="2"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        filter="url(#spark-glow)"
+      />
       {values.map((value, index) => {
         const [x, y] = points[index]!.split(',')
-        return <circle key={index} cx={x} cy={y} r="1.9" fill="hsl(var(--accent))" />
+        return (
+          <circle
+            key={index}
+            cx={x}
+            cy={y}
+            r="2.4"
+            fill="hsl(var(--canvas))"
+            stroke="hsl(var(--accent))"
+            strokeWidth="1.6"
+          />
+        )
       })}
     </svg>
   )

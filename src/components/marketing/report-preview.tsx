@@ -23,7 +23,10 @@ export function ReportPreview() {
         </Badge>
       </div>
 
-      <div className="overflow-hidden rounded-md border border-line bg-[#06110e] text-[#f2efe6] shadow-lift">
+      <div className="group relative">
+        <div className="relative">
+          <div className="absolute -bottom-2 -right-2 hidden h-full w-[97%] rotate-[1.6deg] rounded-md border border-line/60 bg-[#e7e0d2] transition-transform duration-700 group-hover:rotate-[3deg] sm:block" aria-hidden />
+          <div className="relative overflow-hidden rounded-md border border-line bg-[#06110e] text-[#f2efe6] shadow-lift transition-transform duration-700 group-hover:-translate-y-1">
         <div className="relative px-6 py-7">
           <div className="absolute inset-0 opacity-[0.35] [background-image:linear-gradient(hsl(160_40%_40%/0.14)_1px,transparent_1px),linear-gradient(90deg,hsl(160_40%_40%/0.14)_1px,transparent_1px)] [background-size:22px_22px]" />
           <div className="absolute -right-24 top-10 h-64 w-64 rounded-full border border-accent/25" />
@@ -68,9 +71,10 @@ export function ReportPreview() {
             </div>
           </dl>
         </div>
+        </div>
       </div>
 
-      <div className="rounded-md border border-line bg-[#f7f4ee] p-5 text-[#12181a] shadow-lift">
+      <div className="relative mt-4 rounded-md border border-line bg-[#f7f4ee] p-5 text-[#12181a] shadow-lift transition-transform duration-700 group-hover:translate-y-1">
         <div className="flex items-center justify-between border-b border-[#d8d2c4] pb-2">
           <span className="text-[0.6rem] font-semibold tracking-[0.2em]">EDGE<span className="text-[#0f7a5f]">LINK</span></span>
           <span className="font-mono text-[0.52rem] uppercase tracking-[0.16em] text-[#6f7a72]">
@@ -104,6 +108,7 @@ export function ReportPreview() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }

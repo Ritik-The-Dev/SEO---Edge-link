@@ -78,7 +78,7 @@ export default async function ClientOverviewPage() {
         }
       />
 
-      <div className="grid grid-cols-2 divide-line overflow-hidden rounded-md border border-line bg-surface md:grid-cols-4 md:divide-x">
+      <div className="grid grid-cols-2 divide-line/50 overflow-hidden rounded-2xl border border-line/50 bg-gradient-to-br from-surface/60 to-raised/60 backdrop-blur-xl md:grid-cols-4 md:divide-x">
         <Stat label="Websites" value={client.websites.length} hint="monitored by your agency" />
         <Stat label="Audits" value={client.audits.length} hint="most recent 8 shown below" />
         <Stat
@@ -94,43 +94,43 @@ export default async function ClientOverviewPage() {
         />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="mt-8 grid gap-8 lg:grid-cols-3">
+        <div className="min-w-0 space-y-8 lg:col-span-2">
           <Panel>
             <PanelHeader title="Your websites" description="Latest audit state for each site." />
             {client.websites.length === 0 ? (
               <EmptyState
-                icon={<Globe className="h-4 w-4" />}
+                icon={<Globe className="h-5 w-5" />}
                 title="No websites yet"
                 description="Your agency has not registered a website for this account."
               />
             ) : (
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-line/50">
                 {client.websites.map((website) => {
                   const latest = website.audits[0]
                   return (
-                    <li key={website.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <li key={website.id} className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm text-ink">{website.label || hostFromUrl(website.url)}</span>
+                        <div className="flex flex-wrap items-center gap-2.5">
+                          <span className="text-base text-ink">{website.label || hostFromUrl(website.url)}</span>
                           {latest ? <StatusPill status={latest.status} /> : null}
                         </div>
-                        <p className="mt-0.5 font-mono text-[0.62rem] text-faint">
+                        <p className="mt-1 font-mono text-[0.68rem] text-faint">
                           {hostFromUrl(website.url)} · {website.businessType}
                         </p>
                         {website.schedule ? (
-                          <p className="mt-1.5 flex items-center gap-1.5 text-2xs text-faint">
-                            <CalendarClock className="h-3 w-3" />
+                          <p className="mt-2 flex items-center gap-2 text-xs text-faint">
+                            <CalendarClock className="h-3.5 w-3.5" />
                             {website.schedule.isEnabled
                               ? `next audit ${formatDate(website.schedule.nextRunAt)}`
                               : 'scheduled audits paused'}
                           </p>
                         ) : null}
                       </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        {latest ? <ScorePill score={latest.overallScore} /> : <span className="text-2xs text-faint">no audits</span>}
+                      <div className="flex shrink-0 items-center gap-3">
+                        {latest ? <ScorePill score={latest.overallScore} /> : <span className="text-xs text-faint">no audits</span>}
                         {latest?.status === 'COMPLETED' ? (
-                          <Button asChild size="sm" variant="secondary">
+                          <Button asChild size="sm" variant="glass">
                             <Link href={`/client/audits/${latest.id}`}>View audit</Link>
                           </Button>
                         ) : null}
@@ -152,7 +152,7 @@ export default async function ClientOverviewPage() {
                 </Button>
               }
             />
-            <div className="px-5 py-1">
+            <div className="px-6 py-2">
               <AuditTable
                 audits={client.audits}
                 basePath="/client/audits"
@@ -164,45 +164,45 @@ export default async function ClientOverviewPage() {
           </Panel>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           <Panel>
             <PanelHeader title="Latest score" description="AI-assisted technical assessment." />
-            <PanelBody className="flex flex-col items-center gap-3 py-6">
-              <ScoreRing score={latestScore} size={148} stroke={8} />
+            <PanelBody className="flex flex-col items-center gap-4 py-8">
+              <ScoreRing score={latestScore} size={160} stroke={10} />
               {completed[0] ? (
                 <>
-                  <p className="text-xs text-muted">
+                  <p className="text-sm text-muted">
                     {completed[0].website?.url ?? ''}
                   </p>
-                  <Button asChild size="sm" variant="secondary">
+                  <Button asChild size="sm" variant="glass">
                     <Link href={`/client/audits/${completed[0].id}`}>Open audit</Link>
                   </Button>
                 </>
               ) : (
-                <p className="text-xs text-faint">No completed audit yet.</p>
+                <p className="text-sm text-faint">No completed audit yet.</p>
               )}
             </PanelBody>
           </Panel>
 
           <Panel>
             <PanelHeader title="Reports" description="Download the PDF reports from completed audits." />
-            <PanelBody className="space-y-2">
+            <PanelBody className="space-y-3">
               {completed.length === 0 ? (
-                <p className="text-xs text-faint">Reports appear after the first completed audit.</p>
+                <p className="text-sm text-faint">Reports appear after the first completed audit.</p>
               ) : (
                 completed.slice(0, 4).map((audit) => (
                   <a
                     key={audit.id}
                     href={`/api/reports/${audit.id}/download`}
-                    className="flex items-center justify-between gap-3 rounded-sm border border-line px-3 py-2.5 text-xs transition-colors hover:border-muted hover:bg-raised"
+                    className="flex items-center justify-between gap-4 rounded-lg border border-line/50 bg-canvas/50 px-4 py-3 text-sm transition-all hover:border-accent/30 hover:bg-surface/50"
                   >
                     <span className="min-w-0">
                       <span className="block truncate text-ink">{hostFromUrl(audit.website.url)}</span>
-                      <span className="mt-0.5 block font-mono text-[0.58rem] text-faint">
+                      <span className="mt-1 block font-mono text-[0.64rem] text-faint">
                         {formatDate(audit.completedAt ?? audit.createdAt)}
                       </span>
                     </span>
-                    <Download className="h-3.5 w-3.5 shrink-0 text-faint" />
+                    <Download className="h-4 w-4 shrink-0 text-faint" />
                   </a>
                 ))
               )}

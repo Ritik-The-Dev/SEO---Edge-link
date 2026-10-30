@@ -19,6 +19,9 @@ coverage/
 *.tsbuildinfo
 dist/
 
+# local verification screenshots
+screenshots/
+
 # local runtime data
 .data/
 reports/

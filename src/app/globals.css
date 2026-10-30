@@ -4,37 +4,49 @@
 
 @layer base {
   :root {
-    /* Graphite + warm off-white + emerald. Dark is the primary direction. */
-    --canvas: 160 14% 4%;
-    --surface: 158 12% 6%;
-    --raised: 158 10% 9%;
-    --line: 155 8% 16%;
-    --ink: 42 24% 93%;
-    --muted-ink: 150 6% 62%;
-    --faint-ink: 150 6% 52%;
-    --accent: 160 74% 51%;
-    --accent-soft: 160 48% 14%;
-    --accent-ink: 165 60% 6%;
-    --warn: 38 78% 62%;
-    --critical: 7 70% 62%;
-    --info: 199 68% 64%;
+    /* EDGELINK signal palette — warm ivory on near-black, acid lime accent. */
+    --canvas: 150 9% 4.5%;
+    --surface: 150 8% 7.5%;
+    --raised: 150 7% 11.5%;
+    --line: 150 7% 19%;
+    --ink: 42 32% 95%;
+    --muted-ink: 140 6% 67%;
+    --faint-ink: 140 5% 48%;
+    --accent: 82 82% 57%;
+    --accent-soft: 82 42% 13%;
+    --accent-ink: 150 32% 6%;
+    --success: 158 64% 47%;
+    --warn: 38 94% 60%;
+    --warning: 38 94% 60%;
+    --critical: 356 84% 65%;
+    --danger: 356 84% 65%;
+    --info: 197 92% 62%;
+    --gradient-1: 82 82% 57%;
+    --gradient-2: 166 72% 48%;
+    --gradient-3: 262 85% 72%;
     color-scheme: dark;
   }
 
   [data-theme='light'] {
-    --canvas: 40 32% 96%;
-    --surface: 40 36% 99%;
-    --raised: 40 25% 93%;
-    --line: 40 14% 84%;
-    --ink: 164 14% 9%;
-    --muted-ink: 160 7% 34%;
-    --faint-ink: 160 6% 48%;
-    --accent: 161 68% 27%;
-    --accent-soft: 160 40% 90%;
-    --accent-ink: 40 40% 98%;
-    --warn: 33 74% 38%;
-    --critical: 7 62% 44%;
-    --info: 203 64% 38%;
+    --canvas: 42 38% 97%;
+    --surface: 40 40% 99%;
+    --raised: 42 24% 92%;
+    --line: 45 12% 82%;
+    --ink: 155 18% 9%;
+    --muted-ink: 150 7% 36%;
+    --faint-ink: 150 6% 48%;
+    --accent: 84 72% 34%;
+    --accent-soft: 82 60% 88%;
+    --accent-ink: 42 40% 98%;
+    --success: 158 70% 30%;
+    --warn: 32 90% 40%;
+    --warning: 32 90% 40%;
+    --critical: 356 72% 46%;
+    --danger: 356 72% 46%;
+    --info: 200 80% 38%;
+    --gradient-1: 84 72% 34%;
+    --gradient-2: 166 60% 32%;
+    --gradient-3: 262 60% 50%;
     color-scheme: light;
   }
 
@@ -133,11 +145,39 @@
   }
 
   .panel {
-    @apply rounded-md border border-line bg-surface;
+    @apply rounded-xl border border-line bg-surface/80 backdrop-blur-xl;
+    /* Grid items must be allowed to shrink below their content width, or a
+       wide table/URL inside a panel forces the whole page to scroll sideways. */
+    min-width: 0;
+    box-shadow: 0 4px 24px -8px hsl(var(--gradient-1) / 0.15);
   }
 
   .panel-raised {
-    @apply rounded-md border border-line bg-raised;
+    @apply rounded-xl border border-line bg-raised/90 backdrop-blur-xl;
+    box-shadow: 0 8px 32px -12px hsl(var(--gradient-1) / 0.2);
+  }
+
+  .glass-card {
+    @apply rounded-2xl border border-line/60 bg-surface/80 backdrop-blur-2xl;
+    box-shadow: 0 24px 60px -40px hsl(0 0% 0% / 0.9), inset 0 1px 0 0 hsl(var(--ink) / 0.06);
+  }
+
+  .gradient-border {
+    position: relative;
+    background: linear-gradient(135deg, hsl(var(--gradient-1) / 0.2), hsl(var(--gradient-2) / 0.2));
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(var(--gradient-1)), hsl(var(--gradient-2)), hsl(var(--gradient-3)));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.6;
   }
 
   .field {
@@ -178,7 +218,8 @@
 
   /* Stat card with glowing top accent line */
   .stat-card {
-    @apply relative overflow-hidden bg-surface;
+    @apply relative overflow-hidden bg-gradient-to-br from-surface/80 to-raised/80 backdrop-blur-xl;
+    box-shadow: 0 4px 20px -6px hsl(var(--gradient-1) / 0.15);
   }
   .stat-card::before {
     content: '';
@@ -186,8 +227,15 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, hsl(var(--accent) / 0.35), transparent);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(var(--gradient-1)), hsl(var(--gradient-2)), transparent);
+    pointer-events: none;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, hsl(var(--gradient-1) / 0.1), transparent 70%);
     pointer-events: none;
   }
 
@@ -197,19 +245,19 @@
     top: 6px;
     bottom: 6px;
     left: 0;
-    width: 2px;
+    width: 3px;
     border-radius: 9999px;
-    background: hsl(var(--accent));
-    box-shadow: 0 0 8px hsl(var(--accent) / 0.6);
+    background: linear-gradient(180deg, hsl(var(--gradient-1)), hsl(var(--gradient-2)));
+    box-shadow: 0 0 12px hsl(var(--gradient-1) / 0.5);
   }
 }
 
 @layer utilities {
   .text-glow {
-    text-shadow: 0 0 32px hsl(var(--accent) / 0.25);
+    text-shadow: 0 0 32px hsl(var(--gradient-1) / 0.3);
   }
   .text-glow-strong {
-    text-shadow: 0 0 24px hsl(var(--accent) / 0.45), 0 0 56px hsl(var(--accent) / 0.2);
+    text-shadow: 0 0 24px hsl(var(--gradient-1) / 0.5), 0 0 56px hsl(var(--gradient-2) / 0.25);
   }
   .mask-fade-b {
     mask-image: linear-gradient(180deg, black 65%, transparent 100%);
@@ -221,12 +269,394 @@
     display: none;
   }
   .shadow-glow-accent {
-    box-shadow: 0 0 24px -4px hsl(var(--accent) / 0.35);
+    box-shadow: 0 0 32px -6px hsl(var(--gradient-1) / 0.4), 0 0 64px -12px hsl(var(--gradient-2) / 0.2);
   }
   .shadow-glow-sm {
-    box-shadow: 0 0 12px -3px hsl(var(--accent) / 0.2);
+    box-shadow: 0 0 16px -4px hsl(var(--gradient-1) / 0.3);
   }
   .border-accent-subtle {
-    border-color: hsl(var(--accent) / 0.22);
+    border-color: hsl(var(--gradient-1) / 0.25);
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--gradient-1)), hsl(var(--gradient-2)), hsl(var(--gradient-3)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--gradient-1) / 0.15), hsl(var(--gradient-2) / 0.1), hsl(var(--gradient-3) / 0.15));
+  }
+  .gradient-bg-strong {
+    background: linear-gradient(135deg, hsl(var(--gradient-1)), hsl(var(--gradient-2)));
+  }
+  .floating {
+    animation: float-y 6s ease-in-out infinite;
+  }
+  .floating-delayed {
+    animation: float-y 6s ease-in-out infinite;
+    animation-delay: -3s;
   }
 }
+
+/* ============================================================================
+   MOTION SYSTEM — "the instrument is alive"
+   Purposeful, interruptible, and fully disabled under prefers-reduced-motion.
+   ========================================================================== */
+
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-1: 160ms;
+  --dur-2: 280ms;
+  --dur-3: 520ms;
+  --dur-4: 900ms;
+  --aurora-x: 50%;
+  --aurora-y: 20%;
+}
+
+/* Pointer-following ambient light. Sits behind every section. */
+.aurora {
+  background:
+    radial-gradient(
+      42rem 32rem at var(--aurora-x) var(--aurora-y),
+      hsl(var(--accent) / 0.09),
+      transparent 62%
+    ),
+    radial-gradient(30rem 26rem at calc(100% - var(--aurora-x)) 78%, hsl(var(--info) / 0.05), transparent 60%);
+  transition: opacity 600ms var(--ease-out-expo);
+}
+
+/* Section entrances driven by data-inview (IntersectionObserver). */
+[data-inview='false'] .rise {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 720ms var(--ease-out-expo),
+    transform 720ms var(--ease-out-expo);
+  transition-delay: var(--rise-delay, 0ms);
+}
+[data-inview='true'] .rise {
+  opacity: 1;
+  transform: none;
+}
+
+[data-inview='false'] .bar-grow {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1100ms var(--ease-out-expo) var(--bar-delay, 120ms);
+}
+[data-inview='true'] .bar-grow {
+  transform: scaleX(1);
+}
+
+[data-inview='false'] .draw-in {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1400ms var(--ease-out-expo) 240ms;
+}
+[data-inview='true'] .draw-in {
+  stroke-dashoffset: 0;
+}
+
+/* Infinite signal marquee. The track is duplicated; content is factual. */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-drift var(--marquee-duration, 46s) linear infinite;
+  will-change: transform;
+}
+.marquee-wrap:hover .marquee {
+  animation-play-state: paused;
+}
+.marquee-wrap:focus-within .marquee {
+  animation-play-state: paused;
+}
+
+/* Slow orbital rotation for decorative rings. */
+.orbit-slow {
+  animation: orbit 46s linear infinite;
+  transform-origin: center;
+}
+.orbit-reverse {
+  animation: orbit 64s linear infinite reverse;
+  transform-origin: center;
+}
+
+/* Live status pulse. */
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 1px solid hsl(var(--accent) / 0.6);
+  animation: sonar 2.6s var(--ease-out-expo) infinite;
+}
+
+/* A soft scan sweep used on screenshots/plates. */
+.scan-sweep::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, hsl(var(--accent) / 0.06) 48%, transparent 100%);
+  transform: translateY(-100%);
+  animation: sweep 7s var(--ease-out-quint) infinite;
+  pointer-events: none;
+}
+
+/* Hand-drawn underline for editorial emphasis. */
+.ink-underline {
+  position: relative;
+  white-space: nowrap;
+}
+.ink-underline svg {
+  position: absolute;
+  left: -2%;
+  bottom: -0.14em;
+  width: 104%;
+  height: 0.22em;
+  overflow: visible;
+  color: hsl(var(--accent));
+  opacity: 0.75;
+}
+
+/* Buttons that lean into the pointer. */
+.magnetic {
+  transition:
+    transform 400ms var(--ease-out-expo),
+    box-shadow 400ms var(--ease-out-expo);
+}
+
+/* Paper surfaces inside the dark product: warm ivory, dark ink. */
+.paper-band {
+  background: #f2ede2;
+  color: #141917;
+}
+.paper-band .mono-label {
+  color: #5c665f;
+}
+.paper-band .text-muted {
+  color: #4b554e;
+}
+.paper-band .text-faint {
+  color: #5c665f;
+}
+.paper-band .text-ink,
+.paper-band .text-foreground {
+  color: #141917;
+}
+.paper-band .border-line {
+  border-color: #cfc7b6;
+}
+.paper-band .bg-canvas {
+  background-color: #f7f3ea;
+}
+.paper-band ::selection {
+  background: #0f7a5f;
+  color: #f7f4ec;
+}
+
+/* 3D tilt frame. */
+.tilt-frame {
+  transform-style: preserve-3d;
+  transition: transform 500ms var(--ease-out-expo);
+}
+
+/* Text that fills on hover, letter by letter. */
+.fill-word span {
+  transition:
+    color 320ms var(--ease-out-expo),
+    transform 320ms var(--ease-out-expo);
+  display: inline-block;
+}
+.fill-word:hover span {
+  color: hsl(var(--accent));
+  transform: translateY(-0.04em);
+}
+
+@keyframes marquee-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sonar {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  75% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes sweep {
+  0%,
+  8% {
+    transform: translateY(-100%);
+  }
+  42%,
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.stage-visual {
+  animation: stage-in 520ms var(--ease-out-expo) both;
+}
+.stage-line {
+  animation: stage-up 560ms var(--ease-out-expo) both;
+}
+.stage-cell {
+  animation: stage-pop 460ms var(--ease-spring) both;
+}
+
+@keyframes stage-in {
+  from {
+    transform: translate3d(0, 10px, 0) scale(0.995);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes stage-up {
+  from {
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes stage-pop {
+  from {
+    transform: scale(0.55);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes sheen {
+  from {
+    background-position: -180% 0;
+  }
+  to {
+    background-position: 180% 0;
+  }
+}
+
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -240;
+  }
+}
+
+/* Route loader: eight ticks assembling before a page paints. */
+.boot-signal {
+  transform-origin: bottom;
+  animation: boot-signal 1.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes boot-signal {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scaleY(0.35);
+  }
+  38% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* Companion probe: a slow sonar emitted from the guide button. */
+@keyframes probe-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  60% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+/* Guide panel: short, spring-like entrance without layout thrash. */
+.companion-panel {
+  animation: companion-in 420ms var(--ease-spring) both;
+  transform-origin: 100% 100%;
+}
+
+@keyframes companion-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Reduced motion: everything remains readable and interactive. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee,
+  .orbit-slow,
+  .orbit-reverse,
+  .pulse-dot::after,
+  .scan-sweep::before,
+  .companion-panel,
+  .boot-signal {
+    animation: none !important;
+    opacity: 0.75;
+  }
+  .marquee {
+    flex-wrap: wrap;
+    width: auto;
+  }
+  [data-inview] .rise,
+  [data-inview] .bar-grow,
+  [data-inview] .draw-in {
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+  .tilt-frame {
+    transform: none !important;
+  }
+}
+

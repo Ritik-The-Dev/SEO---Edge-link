@@ -87,6 +87,8 @@ export function SignalObservatory({ className }: { className?: string }) {
       canvas.width = Math.round(width * dpr)
       canvas.height = Math.round(height * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      ctx.lineJoin = 'round'
+      ctx.lineCap = 'round'
     }
 
     const project = (latDeg: number, lonDeg: number, radius: number, spin: number, tiltRad: number) => {

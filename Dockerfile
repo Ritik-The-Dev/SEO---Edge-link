@@ -9,46 +9,24 @@
 
 # syntax=docker/dockerfile:1
 
-FROM node:20-bookworm-slim AS base
+FROM node:22-alpine AS base
+
 WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends openssl ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
 
-# Install exactly the locked dependency tree once and reuse it.
-FROM base AS deps
-COPY package.json package-lock.json ./
-# postinstall runs `prisma generate`, so the schema must exist before install.
-COPY prisma/schema.prisma ./prisma/schema.prisma
-RUN npm ci
+# Install dependencies only when needed
+COPY package.json package-lock.json* pnpm-lock.yaml* .npmrc* ./
+RUN npm ci --only=production
 
-FROM deps AS build
-COPY prisma ./prisma
-RUN npx prisma generate
+FROM base AS production
+RUN addgroup --gid 1001 --system nodejs
+RUN adduser --uid 1001 --system --ingroup nodejs nextjs
+
+COPY --from=base /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
 
-# ---- Web: the Next.js server -------------------------------------------------
-FROM base AS web
-ENV NODE_ENV=production
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/prisma ./prisma
-COPY package.json next.config.mjs ./
+RUN chown -R nextjs:nodejs /app
+USER nextjs
+
 EXPOSE 3000
-CMD ["npm", "start"]
 
-# ---- Worker: BullMQ consumer + Puppeteer/Chromium ----------------------------
-FROM base AS worker
-ENV NODE_ENV=production \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends chromium fonts-liberation \
-    && rm -rf /var/lib/apt/lists/*
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json tsconfig.json ./
-COPY src ./src
-COPY prisma ./prisma
-RUN mkdir -p /app/.data/reports
-CMD ["npm", "run", "worker"]
+CMD ["node", "server.js"]

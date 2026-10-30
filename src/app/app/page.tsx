@@ -100,7 +100,7 @@ export default async function AdminOverviewPage() {
         }
       />
 
-      <div className="grid grid-cols-2 divide-line overflow-hidden rounded-md border border-line bg-surface md:grid-cols-4 md:divide-x">
+      <div className="grid grid-cols-2 divide-line/50 overflow-hidden rounded-2xl border border-line/50 bg-gradient-to-br from-surface/60 to-raised/60 backdrop-blur-xl md:grid-cols-4 md:divide-x">
         <Stat label="Active clients" value={formatNumber(clientCount)} hint={`${websiteCount} websites monitored`} />
         <Stat
           label="Audits"
@@ -122,8 +122,8 @@ export default async function AdminOverviewPage() {
         />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="mt-8 grid gap-8 lg:grid-cols-3">
+        <div className="min-w-0 space-y-8 lg:col-span-2">
           <Panel>
             <PanelHeader
               title="Recent audits"
@@ -131,12 +131,12 @@ export default async function AdminOverviewPage() {
               actions={
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/app/audits">
-                    View all <ArrowRight className="h-3.5 w-3.5" />
+                    View all <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               }
             />
-            <div className="px-5 py-1">
+            <div className="px-6 py-2">
               <AuditTable
                 audits={recentAudits.map((audit) => ({
                   ...audit,
@@ -167,7 +167,7 @@ export default async function AdminOverviewPage() {
           </Panel>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           <Panel>
             <PanelHeader
               title="Pipeline health"
@@ -178,31 +178,31 @@ export default async function AdminOverviewPage() {
                 </Badge>
               }
             />
-            <PanelBody className="space-y-4">
-              <div className="flex items-start gap-3">
-                <ServerCog className="mt-0.5 h-4 w-4 text-faint" />
+            <PanelBody className="space-y-5">
+              <div className="flex items-start gap-4">
+                <ServerCog className="mt-0.5 h-5 w-5 text-faint" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[0.7rem] text-ink">{queue.name}</span>
-                    <span className="font-mono text-[0.6rem] uppercase tracking-[0.12em] text-faint">
+                    <span className="font-mono text-[0.72rem] text-ink">{queue.name}</span>
+                    <span className="font-mono text-[0.64rem] uppercase tracking-[0.14em] text-faint">
                       concurrency {config.WORKER_CONCURRENCY}
                     </span>
                   </div>
-                  <dl className="mt-2 grid grid-cols-2 gap-2 text-2xs">
+                  <dl className="mt-3 grid grid-cols-2 gap-3 text-xs">
                     {['waiting', 'active', 'completed', 'failed'].map((key) => (
-                      <div key={key} className="flex items-baseline justify-between rounded-[3px] border border-line px-2 py-1.5">
+                      <div key={key} className="flex items-baseline justify-between rounded-lg border border-line/50 bg-canvas/50 px-3 py-2">
                         <dt className="text-faint">{key}</dt>
                         <dd className="font-mono tabular-nums text-ink">{queue.counts[key] ?? 0}</dd>
                       </div>
                     ))}
                   </dl>
-                  {queue.error ? <p className="mt-2 text-2xs text-critical">{queue.error}</p> : null}
+                  {queue.error ? <p className="mt-3 text-xs text-critical">{queue.error}</p> : null}
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 border-t border-line pt-3">
-                <Database className="mt-0.5 h-4 w-4 text-faint" />
-                <div className="text-2xs leading-relaxed text-muted">
+              <div className="flex items-start gap-4 border-t border-line/50 pt-4">
+                <Database className="mt-0.5 h-5 w-5 text-faint" />
+                <div className="text-xs leading-relaxed text-muted">
                   PostgreSQL via Prisma · {config.USE_MOCKS ? 'mock integrations' : 'live integrations'} ·{' '}
                   {config.AI_USE_MOCKS ? 'AI fixture' : `Claude ${config.ANTHROPIC_MODEL}`}
                 </div>
@@ -222,28 +222,28 @@ export default async function AdminOverviewPage() {
             />
             {schedules.length === 0 ? (
               <EmptyState
-                icon={<CalendarClock className="h-4 w-4" />}
+                icon={<CalendarClock className="h-5 w-5" />}
                 title="No schedules yet"
                 description="Add a monthly schedule so each website gets audited without manual work."
                 action={
-                  <Button asChild size="sm" variant="secondary">
+                  <Button asChild size="sm" variant="glass">
                     <Link href="/app/schedules">Create a schedule</Link>
                   </Button>
                 }
               />
             ) : (
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-line/50">
                 {schedules.map((schedule) => (
-                  <li key={schedule.id} className="px-5 py-3.5">
+                  <li key={schedule.id} className="px-6 py-4">
                     <div className="flex items-baseline justify-between gap-3">
-                      <span className="truncate text-xs text-ink">
+                      <span className="truncate text-sm text-ink">
                         {schedule.website.label || hostFromUrl(schedule.website.url)}
                       </span>
-                      <span className="shrink-0 font-mono text-[0.6rem] text-faint">
+                      <span className="shrink-0 font-mono text-[0.64rem] text-faint">
                         {relativeTime(schedule.nextRunAt)}
                       </span>
                     </div>
-                    <div className="mt-1 text-2xs text-faint">
+                    <div className="mt-1.5 text-xs text-faint">
                       {schedule.website.client.company || schedule.website.client.name} ·{' '}
                       {formatDateTime(schedule.nextRunAt)}
                     </div>
@@ -257,7 +257,7 @@ export default async function AdminOverviewPage() {
             <PanelHeader title="Score trend" description="Completed audits, oldest to newest." />
             <PanelBody>
               <Sparkline values={scores} />
-              <div className="mt-3 flex items-center justify-between font-mono text-[0.6rem] text-faint">
+              <div className="mt-4 flex items-center justify-between font-mono text-[0.64rem] text-faint">
                 <span>{scores.length ? `${scores[0]}` : '—'}</span>
                 <span>latest {scores.length ? scores[scores.length - 1] : '—'}</span>
               </div>

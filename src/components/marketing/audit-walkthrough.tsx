@@ -104,11 +104,17 @@ export function AuditWalkthrough() {
 
       <div className="min-w-0 lg:col-span-8">
         <div className="panel overflow-hidden">
+          <div className="relative h-0.5 w-full bg-line/60">
+            <div
+              className="h-full bg-accent transition-[width] duration-500 ease-out"
+              style={{ width: `${((active + 1) / STEPS.length) * 100}%` }}
+            />
+          </div>
           <div className="flex items-center justify-between border-b border-line px-5 py-3">
             <span className="mono-label">Stage {String(active + 1).padStart(2, '0')} · {step.label}</span>
             <span className="font-mono text-[0.6rem] uppercase tracking-[0.14em] text-faint">pipeline</span>
           </div>
-          <div className="px-5 py-6 sm:px-7">
+          <div key={step.key} className="stage-visual px-5 py-6 sm:px-7">
             <h3 className="font-display text-2xl leading-tight sm:text-[1.75rem]">{step.title}</h3>
             <p className="mt-3 max-w-2xl text-xs leading-relaxed text-muted sm:text-[0.8rem]">{step.body}</p>
 
@@ -122,8 +128,12 @@ export function AuditWalkthrough() {
                 </span>
               </div>
               <pre className="overflow-x-auto font-mono text-[0.68rem] leading-relaxed text-muted">
-                {step.log.map((line) => (
-                  <div key={line} className="whitespace-pre">
+                {step.log.map((line, index) => (
+                  <div
+                    key={line}
+                    className="stage-line whitespace-pre"
+                    style={{ animationDelay: `${80 + index * 90}ms` }}
+                  >
                     <span className="text-accent/70">›</span> {line}
                   </div>
                 ))}

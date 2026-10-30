@@ -173,12 +173,17 @@ export function ProductConsole() {
                   <div
                     className={
                       metric.tone === 'good'
-                        ? 'h-full rounded-full bg-accent'
+                        ? 'h-full rounded-full bg-accent bar-grow'
                         : metric.tone === 'warn'
-                          ? 'h-full rounded-full bg-warn'
-                          : 'h-full rounded-full bg-critical'
+                          ? 'h-full rounded-full bg-warn bar-grow'
+                          : 'h-full rounded-full bg-critical bar-grow'
                     }
-                    style={{ width: `${metric.pct}%` }}
+                    style={
+                      {
+                        width: `${metric.pct}%`,
+                        '--bar-delay': `${180 + METRICS.indexOf(metric) * 90}ms`,
+                      } as React.CSSProperties
+                    }
                   />
                 </div>
                 <div className="mt-1 font-mono text-[0.52rem] uppercase tracking-[0.1em] text-faint">

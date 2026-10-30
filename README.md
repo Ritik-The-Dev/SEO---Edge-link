@@ -1,12 +1,20 @@
 # EdgeLink — SEO Intelligence
 
-**Know what is holding your website back.**
+A premium SEO intelligence platform that makes digital marketing agencies feel as if they have their own technical SEO research department.
 
-A production-minded SEO automation platform for agencies: manage clients and sites, run crawl + AI audits through a BullMQ worker, watch progress live, and deliver a branded PDF report with a mock/live notification trail.
+## Project Overview
 
-Built for the Edgelink Technology full-stack assessment (AI Developer & Automation Engineer — SEO Automation Dashboard).
+This implementation follows the technical assessment requirements for a complete SEO automation platform with:
 
----
+**AI-Powered SEO Analysis**: Claude API integration for automated recommendations
+**Real-Time Crawling**: Website auditing with Fetch + Cheerio
+**Background Processing**: BullMQ job queue with Upstash Redis
+**Premium Reporting**: Puppeteer PDF generation
+**Dual-Portal Interface**: Admin portal + Client dashboard
+**Mock Integrations**: PageSpeed Insights, GSC, DataForSEO, WhatsApp
+**Vercel-Compatible**: Modern Next.js 14 deployment
+**Modern UI**: Dribbble-inspired design with glassmorphism, gradients, and interactive elements
+**Interactive Elements**: Particle backgrounds, 3D tilt effects, and smooth animations
 
 ## What actually works
 
@@ -32,6 +40,20 @@ Everything below is implemented and was exercised against a real Postgres databa
 - Auth: bcrypt credentials, HttpOnly signed session cookie, server-side role checks on every route and API, tenant scoping on every query.
 - Monthly scheduling: per-website day/hour, UTC, next-run computed, and a secret-protected cron endpoint (`POST /api/cron/schedules`) that is idempotent under overlapping invocations.
 - Light and dark theme, reduced-motion support, keyboard focus states.
+
+## Design System
+
+**Visual Identity**: Modern dark theme with vibrant violet/purple gradients and glassmorphism effects
+**Typography**: Distinctive display fonts + readable interface fonts with improved hierarchy
+**Layout**: Asymmetrical editorial design with intentional whitespace and larger spacing
+**Components**: Cohesive design system with consistent states, rounded corners, and backdrop blur
+**Responsive**: Works on desktop, tablet, and mobile
+**Interactive Features**: 
+- Particle background with connected nodes animation
+- 3D tilt effects on cards with mouse tracking
+- Gradient text and glowing accents
+- Smooth transitions and hover animations
+- Floating elements and orbital decorations
 
 ## Stack
 

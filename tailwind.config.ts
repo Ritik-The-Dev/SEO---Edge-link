@@ -22,8 +22,11 @@ const config: Config = {
         accent: 'hsl(var(--accent) / <alpha-value>)',
         'accent-soft': 'hsl(var(--accent-soft) / <alpha-value>)',
         'accent-ink': 'hsl(var(--accent-ink) / <alpha-value>)',
+        success: 'hsl(var(--success) / <alpha-value>)',
         warn: 'hsl(var(--warn) / <alpha-value>)',
+        warning: 'hsl(var(--warning) / <alpha-value>)',
         critical: 'hsl(var(--critical) / <alpha-value>)',
+        danger: 'hsl(var(--danger) / <alpha-value>)',
         info: 'hsl(var(--info) / <alpha-value>)',
       },
       fontFamily: {

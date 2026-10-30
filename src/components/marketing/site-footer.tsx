@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Wordmark } from '@/components/brand'
+import { FooterStatus } from '@/components/marketing/footer-status'
 
 const GROUPS = [
   {
@@ -68,7 +69,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-2xs text-faint sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Edgelink Technology. Working product demonstration.</p>
+          <FooterStatus />
           <p className="max-w-xl leading-relaxed">
             Scores are AI-assisted technical assessments, not Google ranking metrics. No ranking, traffic or revenue
             outcome is promised.

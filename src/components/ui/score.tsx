@@ -29,6 +29,7 @@ export function ScoreRing({
   const value = clamp(score ?? 0)
   const dash = (value / 100) * circumference
   const tone = scoreTone(score)
+  const strokeColor = TONE_STROKE[tone]
 
   return (
     <div
@@ -38,31 +39,44 @@ export function ScoreRing({
       aria-label={`${label ?? 'Overall'} score ${score ?? 'not available'} out of 100`}
     >
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="hsl(var(--line))" strokeWidth={stroke} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="hsl(var(--line))"
+          strokeWidth={stroke}
+        />
         {score !== null && score !== undefined ? (
           <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke={TONE_STROKE[tone]}
+            stroke={strokeColor}
             strokeWidth={stroke}
             strokeLinecap="round"
             strokeDasharray={`${dash} ${circumference}`}
-            className="transition-[stroke-dasharray] duration-700 ease-out"
+            className="transition-[stroke-dasharray] duration-1000 ease-out"
+            style={{
+              filter: `drop-shadow(0 0 6px ${strokeColor}cc)`,
+            }}
           />
         ) : null}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
           className={cn(
-            'font-display leading-none tracking-[-0.02em]',
+            'font-display leading-none tracking-[-0.02em] transition-colors duration-500',
             size >= 120 ? 'text-4xl' : size >= 88 ? 'text-2xl' : 'text-lg',
+            tone === 'good' && 'text-success',
+            tone === 'fair' && 'text-warn',
+            tone === 'poor' && 'text-critical',
           )}
         >
           {score ?? '—'}
         </span>
-        <span className="mt-1 font-mono text-[0.6rem] uppercase tracking-[0.18em] text-faint">/ 100</span>
+        <span className="mt-1 font-mono text-[0.6rem] uppercase tracking-[0.18em] text-muted">/ 100</span>
       </div>
     </div>
   )
